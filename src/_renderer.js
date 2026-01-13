@@ -633,13 +633,9 @@ window.openSettings = async () => {
     if (document.getElementById("settingsEditor")) return;
 
     // Build lists of available keyboards, themes, monitors
-    let keyboards, themes, monitors, ifaces;
-    fs.readdirSync(keyboardsDir).forEach(kb => {
-        if (!kb.endsWith(".json")) return;
-        kb = kb.replace(".json", "");
-        if (kb === window.settings.keyboard) return;
-        keyboards += `<option>${kb}</option>`;
-    });
+    // Build lists of available keyboards, themes, monitors
+    let themes, monitors, ifaces;
+
     fs.readdirSync(themesDir).forEach(th => {
         if (!th.endsWith(".json")) return;
         th = th.replace(".json", "");
@@ -693,14 +689,7 @@ window.openSettings = async () => {
                         <td>Custom username to display at boot</td>
                         <td><input type="text" id="settingsEditor-username" value="${window.settings.username}"></td>
                     </tr>
-                    <tr>
-                        <td>keyboard</td>
-                        <td>On-screen keyboard layout code</td>
-                        <td><select id="settingsEditor-keyboard">
-                            <option>${window.settings.keyboard}</option>
-                            ${keyboards}
-                        </select></td>
-                    </tr>
+
                     <tr>
                         <td>theme</td>
                         <td>Name of the theme to load</td>
