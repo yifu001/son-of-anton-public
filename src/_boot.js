@@ -1,9 +1,9 @@
 const signale = require("signale");
-const {app, BrowserWindow, dialog, shell} = require("electron");
+const { app, BrowserWindow, dialog, shell } = require("electron");
 
 process.on("uncaughtException", e => {
     signale.fatal(e);
-    dialog.showErrorBox("eDEX-UI crashed", e.message || "Cannot retrieve error message.");
+    dialog.showErrorBox("Son of Anton crashed", e.message || "Cannot retrieve error message.");
     if (tty) {
         tty.close();
     }
@@ -17,7 +17,7 @@ process.on("uncaughtException", e => {
     process.exit(1);
 });
 
-signale.start(`Starting eDEX-UI v${app.getVersion()}`);
+signale.start(`Starting Son of Anton v${app.getVersion()}`);
 signale.info(`With Node ${process.versions.node} and Electron ${process.versions.electron}`);
 signale.info(`Renderer is Chrome ${process.versions.chrome}`);
 
@@ -67,7 +67,7 @@ app.commandLine.appendSwitch("enable-video-decode");
 try {
     fs.mkdirSync(electron.app.getPath("userData"));
     signale.info(`Created config dir at ${electron.app.getPath("userData")}`);
-} catch(e) {
+} catch (e) {
     signale.info(`Base config dir is ${electron.app.getPath("userData")}`);
 }
 // Create default settings file
@@ -118,7 +118,7 @@ if (!fs.existsSync(shortcutsFile)) {
     signale.info(`Default keymap written to ${shortcutsFile}`);
 }
 //Create default window state file
-if(!fs.existsSync(lastWindowStateFile)) {
+if (!fs.existsSync(lastWindowStateFile)) {
     fs.writeFileSync(lastWindowStateFile, JSON.stringify({
         useFullscreen: true
     }, "", 4));
@@ -129,23 +129,23 @@ if(!fs.existsSync(lastWindowStateFile)) {
 signale.pending("Mirroring internal assets...");
 try {
     fs.mkdirSync(themesDir);
-} catch(e) {
+} catch (e) {
     // Folder already exists
 }
 fs.readdirSync(innerThemesDir).forEach(e => {
-    fs.writeFileSync(path.join(themesDir, e), fs.readFileSync(path.join(innerThemesDir, e), {encoding:"utf-8"}));
+    fs.writeFileSync(path.join(themesDir, e), fs.readFileSync(path.join(innerThemesDir, e), { encoding: "utf-8" }));
 });
 try {
     fs.mkdirSync(kblayoutsDir);
-} catch(e) {
+} catch (e) {
     // Folder already exists
 }
 fs.readdirSync(innerKblayoutsDir).forEach(e => {
-    fs.writeFileSync(path.join(kblayoutsDir, e), fs.readFileSync(path.join(innerKblayoutsDir, e), {encoding:"utf-8"}));
+    fs.writeFileSync(path.join(kblayoutsDir, e), fs.readFileSync(path.join(innerKblayoutsDir, e), { encoding: "utf-8" }));
 });
 try {
     fs.mkdirSync(fontsDir);
-} catch(e) {
+} catch (e) {
     // Folder already exists
 }
 fs.readdirSync(innerFontsDir).forEach(e => {
@@ -157,14 +157,14 @@ const versionHistoryPath = path.join(electron.app.getPath("userData"), "versions
 var versionHistory = fs.existsSync(versionHistoryPath) ? require(versionHistoryPath) : {};
 var version = app.getVersion();
 if (typeof versionHistory[version] === "undefined") {
-	versionHistory[version] = {
-		firstSeen: Date.now(),
-		lastSeen: Date.now()
-	};
+    versionHistory[version] = {
+        firstSeen: Date.now(),
+        lastSeen: Date.now()
+    };
 } else {
-	versionHistory[version].lastSeen = Date.now();
+    versionHistory[version].lastSeen = Date.now();
 }
-fs.writeFileSync(versionHistoryPath, JSON.stringify(versionHistory, 0, 2), {encoding:"utf-8"});
+fs.writeFileSync(versionHistoryPath, JSON.stringify(versionHistory, 0, 2), { encoding: "utf-8" });
 
 function createWindow(settings) {
     signale.info("Creating window...");
@@ -175,10 +175,10 @@ function createWindow(settings) {
     } else {
         display = electron.screen.getPrimaryDisplay();
     }
-    let {x, y, width, height} = display.bounds;
+    let { x, y, width, height } = display.bounds;
     width++; height++;
     win = new BrowserWindow({
-        title: "eDEX-UI",
+        title: "Son of Anton",
         x,
         y,
         width,
@@ -192,7 +192,7 @@ function createWindow(settings) {
         backgroundColor: '#000000',
         webPreferences: {
             devTools: true,
-	    enableRemoteModule: true,
+            enableRemoteModule: true,
             contextIsolation: false,
             backgroundThrottling: false,
             webSecurity: true,
@@ -224,7 +224,7 @@ app.on('ready', async () => {
     signale.pending(`Loading settings file...`);
     let settings = require(settingsFile);
     signale.pending(`Resolving shell path...`);
-    settings.shell = await which(settings.shell).catch(e => { throw(e) });
+    settings.shell = await which(settings.shell).catch(e => { throw (e) });
     signale.info(`Shell found at ${settings.shell}`);
     signale.success(`Settings loaded!`);
 
@@ -236,7 +236,7 @@ app.on('ready', async () => {
     Object.assign(cleanEnv, {
         TERM: "xterm-256color",
         COLORTERM: "truecolor",
-        TERM_PROGRAM: "eDEX-UI",
+        TERM_PROGRAM: "Son of Anton",
         TERM_PROGRAM_VERSION: app.getVersion()
     }, settings.env);
 
@@ -251,7 +251,7 @@ app.on('ready', async () => {
     });
     signale.success(`Terminal back-end initialized!`);
     tty.onclosed = (code, signal) => {
-        tty.ondisconnected = () => {};
+        tty.ondisconnected = () => { };
         signale.complete("Terminal exited", code, signal);
         app.quit();
     };
@@ -279,7 +279,7 @@ app.on('ready', async () => {
     basePort = Number(basePort) + 2;
 
     for (let i = 0; i < 4; i++) {
-        extraTtys[basePort+i] = null;
+        extraTtys[basePort + i] = null;
     }
 
     ipc.on("ttyspawn", (e, arg) => {
@@ -306,7 +306,7 @@ app.on('ready', async () => {
             });
             signale.success(`New terminal back-end initialized at ${port}`);
             term.onclosed = (code, signal) => {
-                term.ondisconnected = () => {};
+                term.ondisconnected = () => { };
                 term.wss.close();
                 signale.complete(`TTY exited at ${port}`, code, signal);
                 extraTtys[term.port] = null;
@@ -315,9 +315,9 @@ app.on('ready', async () => {
             term.onopened = pid => {
                 signale.success(`TTY ${port} connected to frontend (process PID ${pid})`);
             };
-            term.onresized = () => {};
+            term.onresized = () => { };
             term.ondisconnected = () => {
-                term.onclosed = () => {};
+                term.onclosed = () => { };
                 term.close();
                 term.wss.close();
                 extraTtys[term.port] = null;
@@ -325,7 +325,7 @@ app.on('ready', async () => {
             };
 
             extraTtys[port] = term;
-            e.sender.send("ttyspawn-reply", "SUCCESS: "+port);
+            e.sender.send("ttyspawn-reply", "SUCCESS: " + port);
         }
     });
 

@@ -1,6 +1,6 @@
 {
   "name": "edex-ui",
-  "productName": "eDEX-UI",
+  "productName": "Son of Anton",
   "version": "2.2.8",
   "description": "A science fiction desktop running everywhere. Awesome.",
   "keywords": [
@@ -42,7 +42,7 @@
   "homepage": "https://github.com/GitSquared/edex-ui#readme",
   "build": {
     "appId": "com.edex.ui",
-    "productName": "eDEX-UI",
+    "productName": "Son of Anton",
     "publish": "github",
     "asar": true,
     "compression": "normal",
@@ -53,7 +53,7 @@
     },
     "forceCodeSigning": false,
     "npmRebuild": true,
-    "artifactName": "eDEX-UI-${os}-${arch}.${ext}",
+    "artifactName": "Son of Anton-${os}-${arch}.${ext}",
     "linux": {
       "target": [
         "AppImage"
@@ -62,7 +62,7 @@
       "icon": "media/linuxIcons"
     },
     "appImage": {
-      "artifactName": "eDEX-UI-Linux-${arch}.AppImage"
+      "artifactName": "Son of Anton-Linux-${arch}.AppImage"
     },
     "mac": {
       "target": [
@@ -77,7 +77,7 @@
       "icon": "media/icon.icns"
     },
     "dmg": {
-      "artifactName": "eDEX-UI-macOS-${arch}.dmg"
+      "artifactName": "Son of Anton-macOS-${arch}.dmg"
     },
     "win": {
       "target": [
@@ -92,7 +92,7 @@
       "icon": "media/icon.ico"
     },
     "nsis": {
-      "artifactName": "eDEX-UI-Windows-${arch}.exe",
+      "artifactName": "Son of Anton-Windows-${arch}.exe",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "deleteAppDataOnUninstall": true

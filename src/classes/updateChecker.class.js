@@ -18,10 +18,10 @@ class UpdateChecker {
             host: "api.github.com",
             path: "/repos/GitSquared/edex-ui/releases/latest",
             headers: {
-                "User-Agent": "eDEX-UI UpdateChecker"
+                "User-Agent": "Son of Anton UpdateChecker"
             }
         }, res => {
-            switch(res.statusCode) {
+            switch (res.statusCode) {
                 case 200:
                     break;
                 case 404:
@@ -54,11 +54,11 @@ class UpdateChecker {
                             new Modal({
                                 type: "info",
                                 title: "New version available",
-                                message: `eDEX-UI <strong>${release.tag_name}</strong> is now available.<br/>Head over to <a href="#" onclick="require('electron').shell.openExternal('${release.html_url}')">github.com</a> to download the latest version.`
+                                message: `Son of Anton <strong>${release.tag_name}</strong> is now available.<br/>Head over to <a href="#" onclick="require('electron').shell.openExternal('${release.html_url}')">github.com</a> to download the latest version.`
                             });
                             electron.ipcRenderer.send("log", "info", `UpdateChecker: New version ${release.tag_name} available.`);
                         }
-                    } catch(e) {
+                    } catch (e) {
                         this._fail(e);
                     }
                 }
