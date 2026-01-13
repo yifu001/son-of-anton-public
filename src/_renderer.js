@@ -860,7 +860,7 @@ window.writeSettingsFile = () => {
         cwd: document.getElementById("settingsEditor-cwd").value,
         env: document.getElementById("settingsEditor-env").value,
         username: document.getElementById("settingsEditor-username").value,
-        keyboard: document.getElementById("settingsEditor-keyboard").value,
+        keyboard: window.settings.keyboard || "en-US",
         theme: document.getElementById("settingsEditor-theme").value,
         termFontSize: Number(document.getElementById("settingsEditor-termFontSize").value),
         audio: (document.getElementById("settingsEditor-audio").value === "true"),
