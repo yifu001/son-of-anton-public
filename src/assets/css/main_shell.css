@@ -1,6 +1,6 @@
 section#main_shell {
     width: 65%;
-    height: 60.3%;
+    height: 95%;
     padding: 0.74vh;
     /* border: 0.18vh solid rgba(var(--color_r), var(--color_g), var(--color_b), 0.5); */
     /* border-radius: 0.278vh; */
@@ -26,19 +26,19 @@ h1#main_shell_greeting {
     transition: opacity .5s cubic-bezier(0.4, 0, 1, 1);
 }
 
-h1#main_shell_greeting > em {
+h1#main_shell_greeting>em {
     font-style: normal;
     font-weight: bold;
 }
 
-section#main_shell > h3.title {
+section#main_shell>h3.title {
     top: 0.74vh;
     left: 16.5vw;
     width: 66%;
     transition: opacity .5s cubic-bezier(0.4, 0, 1, 1) .5s;
 }
 
-section#main_shell > h3.title > p {
+section#main_shell>h3.title>p {
     width: 49.8%;
 }
 
@@ -60,7 +60,7 @@ ul#main_shell_tabs {
     overflow: hidden;
 }
 
-ul#main_shell_tabs > li {
+ul#main_shell_tabs>li {
     cursor: pointer;
     display: block;
     font-family: var(--font_main);
@@ -74,15 +74,17 @@ ul#main_shell_tabs > li {
     background: var(--color_light_black);
     transform: skewX(35deg);
 }
-ul#main_shell_tabs > li > p {
+
+ul#main_shell_tabs>li>p {
     margin: 0;
     transform: skewX(-35deg);
 }
-ul#main_shell_tabs > li:not(:first-child) {
+
+ul#main_shell_tabs>li:not(:first-child) {
     border-left: 0.18vh solid rgba(var(--color_r), var(--color_g), var(--color_b), 0.5);
 }
 
-ul#main_shell_tabs > li.active {
+ul#main_shell_tabs>li.active {
     background: rgb(var(--color_r), var(--color_g), var(--color_b));
     color: var(--color_light_black);
     font-weight: bold;
@@ -90,7 +92,8 @@ ul#main_shell_tabs > li.active {
     z-index: -1;
 }
 
-div#main_shell_innercontainer, div#main_shell_innercontainer pre {
+div#main_shell_innercontainer,
+div#main_shell_innercontainer pre {
     height: 100%;
     width: 100%;
     margin: 0vh;
@@ -111,12 +114,15 @@ div#main_shell_innercontainer pre.active {
 div#main_shell_innercontainer pre#terminal1 {
     top: -100%;
 }
+
 div#main_shell_innercontainer pre#terminal2 {
     top: -200%;
 }
+
 div#main_shell_innercontainer pre#terminal3 {
     top: -300%;
 }
+
 div#main_shell_innercontainer pre#terminal4 {
     top: -400%;
 }

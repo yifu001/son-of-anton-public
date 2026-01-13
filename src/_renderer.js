@@ -345,7 +345,7 @@ async function initUI() {
     document.body.innerHTML += `<section class="mod_column" id="mod_column_left">
         <h3 class="title"><p>PANEL</p><p>SYSTEM</p></h3>
     </section>
-    <section id="main_shell" style="height:0%;width:0%;opacity:0;margin-bottom:30vh;" augmented-ui="bl-clip tr-clip exe">
+    <section id="main_shell" style="height:0%;width:0%;opacity:0;margin-bottom:0vh;" augmented-ui="bl-clip tr-clip exe">
         <h3 class="title" style="opacity:0;"><p>TERMINAL</p><p>MAIN SHELL</p></h3>
         <h1 id="main_shell_greeting"></h1>
     </section>
@@ -356,25 +356,30 @@ async function initUI() {
     await _delay(10);
 
     window.audioManager.expand.play();
-    document.getElementById("main_shell").setAttribute("style", "height:0%;margin-bottom:30vh;");
+    document.getElementById("main_shell").setAttribute("style", "height:0%;margin-bottom:0vh;");
 
     await _delay(500);
 
-    document.getElementById("main_shell").setAttribute("style", "margin-bottom: 30vh;");
+    document.getElementById("main_shell").setAttribute("style", "margin-bottom: 0vh;");
     document.querySelector("#main_shell > h3.title").setAttribute("style", "");
 
     await _delay(700);
 
     document.getElementById("main_shell").setAttribute("style", "opacity: 0;");
+    document.getElementById("main_shell").setAttribute("style", "opacity: 0;");
+    /* Minimal Redesign: Removed Filesystem and Keyboard sections
     document.body.innerHTML += `
     <section id="filesystem" style="width: 0px;" class="${window.settings.hideDotfiles ? "hideDotfiles" : ""} ${window.settings.fsListView ? "list-view" : ""}">
     </section>
     <section id="keyboard" style="opacity:0;">
     </section>`;
+    */
+    /* Minimal Redesign: Disabled Keyboard initialization
     window.keyboard = new Keyboard({
         layout: path.join(keyboardsDir, settings.keyboard + ".json"),
         container: "keyboard"
     });
+    */
 
     await _delay(10);
 
@@ -394,14 +399,14 @@ async function initUI() {
 
     greeter.setAttribute("style", "opacity: 1;");
 
-    document.getElementById("filesystem").setAttribute("style", "");
-    document.getElementById("keyboard").setAttribute("style", "");
-    document.getElementById("keyboard").setAttribute("class", "animation_state_1");
-    window.audioManager.keyboard.play();
+    // document.getElementById("filesystem").setAttribute("style", "");
+    // document.getElementById("keyboard").setAttribute("style", "");
+    // document.getElementById("keyboard").setAttribute("class", "animation_state_1");
+    // window.audioManager.keyboard.play();
 
     await _delay(100);
 
-    document.getElementById("keyboard").setAttribute("class", "animation_state_1 animation_state_2");
+    // document.getElementById("keyboard").setAttribute("class", "animation_state_1 animation_state_2");
 
     await _delay(1000);
 
@@ -409,7 +414,7 @@ async function initUI() {
 
     await _delay(100);
 
-    document.getElementById("keyboard").setAttribute("class", "");
+    // document.getElementById("keyboard").setAttribute("class", "");
 
     await _delay(400);
 
@@ -485,15 +490,17 @@ async function initUI() {
     };
     // Prevent losing hardware keyboard focus on the terminal when using touch keyboard
     window.onmouseup = e => {
-        if (window.keyboard.linkedToTerm) window.term[window.currentTerm].term.focus();
+        // if (window.keyboard.linkedToTerm) window.term[window.currentTerm].term.focus();
     };
-    window.term[0].term.writeln("\033[1m" + `Welcome to Son of Anton v${electron.remote.app.getVersion()} - Electron v${process.versions.electron}` +"\033[0m");
+    window.term[0].term.writeln("\x1b[1m" + `Welcome to Son of Anton v${electron.remote.app.getVersion()} - Electron v${process.versions.electron}` + "\x1b[0m");
 
     await _delay(100);
 
+    /* Minimal Redesign: Disabled FilesystemDisplay initialization
     window.fsDisp = new FilesystemDisplay({
         parentId: "filesystem"
     });
+    */
 
     await _delay(200);
 
@@ -507,6 +514,42 @@ async function initUI() {
     await _delay(200);
 
     window.updateCheck = new UpdateChecker();
+
+    /* Minimal Redesign: Append placeholders to the bottom of columns using DOM API */
+    const createPlaceholders = (columnId) => {
+        const column = document.getElementById(columnId);
+        if (column) {
+            column.style.opacity = "1"; // Ensure column is visible
+            column.style.display = "flex"; // Ensure flex layout
+
+            // Create placeholders
+            const p1 = document.createElement("div");
+            p1.className = "placeholder-panel";
+            p1.innerHTML = `<h3 class="title"><p>STATUS</p><p>OFFLINE</p></h3><h2 class="placeholder-text">RESERVED</h2>`;
+
+            const p2 = document.createElement("div");
+            p2.className = "placeholder-panel";
+            p2.innerHTML = `<h3 class="title"><p>STATUS</p><p>OFFLINE</p></h3><h2 class="placeholder-text">RESERVED</h2>`;
+
+            column.appendChild(p1);
+            column.appendChild(p2);
+        }
+    };
+
+    createPlaceholders("mod_column_left");
+    createPlaceholders("mod_column_right");
+
+    /* Restore Settings Shortcut (Ctrl+Shift+S) */
+    document.addEventListener("keydown", e => {
+        if (e.ctrlKey && e.shiftKey && (e.key === "s" || e.key === "S")) {
+            window.openSettings();
+        }
+    });
+
+    /* Self-Test: Verify UI Integrity */
+    setTimeout(() => {
+        if (window.runUITests) window.runUITests();
+    }, 2000);
 }
 
 window.themeChanger = theme => {
@@ -545,7 +588,7 @@ window.focusShellTab = number => {
         window.term[number].term.focus();
         window.term[number].resendCWD();
 
-        window.fsDisp.followTab();
+        // window.fsDisp.followTab();
     } else if (number > 0 && number <= 4 && window.term[number] !== null && typeof window.term[number] !== "object") {
         window.term[number] = null;
 
@@ -612,7 +655,9 @@ window.openSettings = async () => {
     });
 
     // Unlink the tactile keyboard from the terminal emulator to allow filling in the settings fields
-    window.keyboard.detach();
+    if (window.keyboard && window.keyboard.detach) {
+        window.keyboard.detach();
+    }
 
     new Modal({
         type: "custom",
