@@ -504,7 +504,10 @@ async function initUI() {
 
     await _delay(200);
 
-    document.getElementById("filesystem").setAttribute("style", "opacity: 1;");
+    const filesystemEl = document.getElementById("filesystem");
+    if (filesystemEl) {
+        filesystemEl.setAttribute("style", "opacity: 1;");
+    }
 
     // Resend terminal CWD to fsDisp if we're hot reloading
     if (window.performance.navigation.type === 1) {
@@ -546,6 +549,30 @@ async function initUI() {
         }
     });
 
+    /* Minimal Redesign: Standalone keyboard sound handler (replaces keyboard.class.js sounds) */
+    window.passwordMode = "false";
+    let lastKeySoundTime = 0;
+    document.addEventListener("keydown", e => {
+        // Skip modifier-only keys and repeated keys for sound
+        if (e.repeat && (e.code.startsWith('Shift') || e.code.startsWith('Alt') ||
+            e.code.startsWith('Control') || e.code.startsWith('Caps'))) {
+            return;
+        }
+        // Throttle sound to avoid overwhelming audio
+        const now = Date.now();
+        if (now - lastKeySoundTime < 30) return;
+        lastKeySoundTime = now;
+
+        if (window.passwordMode === "false") {
+            window.audioManager.stdin.play();
+        }
+    });
+    document.addEventListener("keyup", e => {
+        if (window.passwordMode === "false" && e.key === "Enter") {
+            window.audioManager.granted.play();
+        }
+    });
+
     /* Self-Test: Verify UI Integrity */
     setTimeout(() => {
         if (window.runUITests) window.runUITests();
@@ -560,7 +587,12 @@ window.themeChanger = theme => {
 };
 
 window.remakeKeyboard = layout => {
-    document.getElementById("keyboard").innerHTML = "";
+    const keyboardEl = document.getElementById("keyboard");
+    if (!keyboardEl) {
+        console.warn("[remakeKeyboard] Keyboard element not found - keyboard disabled in minimal redesign");
+        return;
+    }
+    keyboardEl.innerHTML = "";
     window.keyboard = new Keyboard({
         layout: path.join(keyboardsDir, layout + ".json" || settings.keyboard + ".json"),
         container: "keyboard"
@@ -840,7 +872,9 @@ window.openSettings = async () => {
         ]
     }, () => {
         // Link the keyboard back to the terminal
-        window.keyboard.attach();
+        if (window.keyboard && window.keyboard.attach) {
+            window.keyboard.attach();
+        }
 
         // Focus back on the term
         window.term[window.currentTerm].term.focus();
@@ -947,7 +981,9 @@ window.openShortcutsHelp = () => {
                         </tr>`;
     });
 
-    window.keyboard.detach();
+    if (window.keyboard && window.keyboard.detach) {
+        window.keyboard.detach();
+    }
     new Modal({
         type: "custom",
         title: `Available Keyboard Shortcuts <i>(v${electron.remote.app.getVersion()})</i>`,
@@ -981,7 +1017,9 @@ window.openShortcutsHelp = () => {
             { label: "Reload UI", action: "window.location.reload(true);" },
         ]
     }, () => {
-        window.keyboard.attach();
+        if (window.keyboard && window.keyboard.attach) {
+            window.keyboard.attach();
+        }
         window.term[window.currentTerm].term.focus();
     });
 
@@ -1057,13 +1095,23 @@ window.useAppShortcut = action => {
             window.activeFuzzyFinder = new FuzzyFinder();
             return true;
         case "FS_LIST_VIEW":
-            window.fsDisp.toggleListview();
+            if (window.fsDisp && window.fsDisp.toggleListview) {
+                window.fsDisp.toggleListview();
+            }
             return true;
         case "FS_DOTFILES":
-            window.fsDisp.toggleHidedotfiles();
+            if (window.fsDisp && window.fsDisp.toggleHidedotfiles) {
+                window.fsDisp.toggleHidedotfiles();
+            }
             return true;
         case "KB_PASSMODE":
-            window.keyboard.togglePasswordMode();
+            if (window.keyboard && window.keyboard.togglePasswordMode) {
+                window.keyboard.togglePasswordMode();
+            } else {
+                // Standalone password mode toggle when keyboard is disabled
+                window.passwordMode = (window.passwordMode === "false") ? "true" : "false";
+                console.log(`[KB_PASSMODE] Password mode: ${window.passwordMode}`);
+            }
             return true;
         case "DEV_DEBUG":
             electron.remote.getCurrentWindow().webContents.toggleDevTools();
