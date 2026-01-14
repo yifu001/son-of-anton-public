@@ -22,8 +22,12 @@ window.runUITests = () => {
             check: () => document.getElementById("mod_column_right") !== null
         },
         {
-            name: "Placeholders Present",
-            check: () => document.querySelectorAll(".placeholder-panel").length === 4
+            name: "Claude Usage Widget Present",
+            check: () => document.getElementById("mod_claudeUsage") !== null
+        },
+        {
+            name: "Active Agents Widget Present",
+            check: () => document.getElementById("mod_agentList") !== null
         }
     ];
 

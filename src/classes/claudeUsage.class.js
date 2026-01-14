@@ -27,16 +27,20 @@ class ClaudeUsage {
         const path = require("path");
         const fs = require("fs");
         try {
-            // Try project root first
-            const localSecrets = path.join(__dirname, "..", "..", "secrets.json");
-            if (fs.existsSync(localSecrets)) {
-                this.secrets = JSON.parse(fs.readFileSync(localSecrets, "utf-8"));
-                return;
+            const appPath = require("@electron/remote").app.getAppPath();
+
+            // Try project root (appPath)
+            let secretsPath = path.join(appPath, "secrets.json");
+
+            // In development, appPath might be the 'src' folder or project root
+            if (!fs.existsSync(secretsPath)) {
+                secretsPath = path.join(appPath, "..", "secrets.json");
             }
-            // Fallback to userData path
-            const secretsPath = path.join(require("@electron/remote").app.getPath("userData"), "..", "..", "Desktop", "yifuzuo", "projects", "edex-ui", "secrets.json");
+
             if (fs.existsSync(secretsPath)) {
                 this.secrets = JSON.parse(fs.readFileSync(secretsPath, "utf-8"));
+            } else {
+                console.error("Secrets file not found at:", secretsPath);
             }
         } catch (e) {
             console.error("Failed to load secrets:", e);
@@ -165,6 +169,5 @@ class ClaudeUsage {
     }
 }
 
-module.exports = {
-    ClaudeUsage
-};
+
+// window.ClaudeUsage = ClaudeUsage;

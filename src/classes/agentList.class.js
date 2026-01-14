@@ -25,7 +25,8 @@ class AgentList {
         const path = require("path");
         const fs = require("fs");
 
-        const brainDir = path.join(require("@electron/remote").app.getPath("userData"), "..", "..", ".gemini", "antigravity", "brain");
+        const homeDir = require("@electron/remote").app.getPath("home");
+        const brainDir = path.join(homeDir, ".gemini", "antigravity", "brain");
         const agents = [];
 
         try {
@@ -96,6 +97,5 @@ class AgentList {
     }
 }
 
-module.exports = {
-    AgentList
-};
+
+// window.AgentList = AgentList;
