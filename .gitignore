@@ -42,3 +42,7 @@ jspm_packages
 dist
 prebuild-src
 src/node_modules
+
+# Project specific ignores
+secrets.json
+tmpclaude-*
