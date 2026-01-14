@@ -1,13 +1,21 @@
-class ClaudeUsage extends Module {
-    constructor(container) {
-        super(container, "mod_claudeUsage");
-        this.container = container;
+class ClaudeUsage {
+    constructor(parentId) {
+        if (!parentId) throw "Missing parameters";
+
         this.secrets = {};
+        this.parent = document.getElementById(parentId);
+        this.parent.innerHTML += `<div id="mod_claudeUsage">
+            <h1>CLAUDE USAGE</h1>
+            <div id="mod_claudeUsage_content">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>`;
+
+        this.contentEl = document.getElementById("mod_claudeUsage_content");
         this.init();
     }
 
     async init() {
-        this.setTitle("CLAUDE USAGE (ADMIN API)");
         this.loadSecrets();
         await this.fetchUsageData();
 
@@ -19,15 +27,16 @@ class ClaudeUsage extends Module {
         const path = require("path");
         const fs = require("fs");
         try {
+            // Try project root first
+            const localSecrets = path.join(__dirname, "..", "..", "secrets.json");
+            if (fs.existsSync(localSecrets)) {
+                this.secrets = JSON.parse(fs.readFileSync(localSecrets, "utf-8"));
+                return;
+            }
+            // Fallback to userData path
             const secretsPath = path.join(require("@electron/remote").app.getPath("userData"), "..", "..", "Desktop", "yifuzuo", "projects", "edex-ui", "secrets.json");
-             // Fallback to local if running from source check
             if (fs.existsSync(secretsPath)) {
                 this.secrets = JSON.parse(fs.readFileSync(secretsPath, "utf-8"));
-            } else {
-                 const localSecrets = path.join(__dirname, "..", "..", "secrets.json");
-                 if(fs.existsSync(localSecrets)) {
-                    this.secrets = JSON.parse(fs.readFileSync(localSecrets, "utf-8"));
-                 }
             }
         } catch (e) {
             console.error("Failed to load secrets:", e);
@@ -36,7 +45,7 @@ class ClaudeUsage extends Module {
 
     async fetchUsageData() {
         if (!this.secrets.claudeApiKey) {
-            this.renderError("No API Key found in secrets.json");
+            this.renderError("No API Key in secrets.json");
             return;
         }
 
@@ -50,104 +59,112 @@ class ClaudeUsage extends Module {
     }
 
     async getUsageFromApi(apiKey) {
-        // Calculate date range (Today)
         const now = new Date();
-        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
 
-        // Calculate date range (This Week) - Simplified to last 7 days
-        const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        // Session: Last 5 hours (use 1h bucket for precision)
+        const sessionStart = new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString();
 
-        // Fetch Today
-        const dailyParams = new URLSearchParams({
-            starting_at: startOfDay,
-            ending_at: endOfToday,
-            bucket_width: "1d"
-        });
+        // Weekly: Since last Friday 6:00 AM (use 1d bucket)
+        let lastFriday = new Date(now);
+        lastFriday.setDate(now.getDate() - (now.getDay() + 2) % 7);
+        lastFriday.setHours(6, 0, 0, 0);
+        if (lastFriday > now) lastFriday.setDate(lastFriday.getDate() - 7);
+        const weeklyStart = lastFriday.toISOString();
 
-        // Fetch Weekly
-        const weeklyParams = new URLSearchParams({
-            starting_at: startOfWeek,
-            ending_at: endOfToday,
-            bucket_width: "1d"
-        });
+        const endOfToday = now.toISOString();
+
+        const baseUrl = "https://api.anthropic.com/v1/organizations/usage_report/messages";
 
         const fetchOptions = {
             method: "GET",
             headers: {
-                "x-api-key": apiKey,
-                "anthropic-version": "2023-01-01"
+                "X-Api-Key": apiKey,
+                "anthropic-version": "2023-06-01"
             }
         };
 
-        // Note: Electron renderer might benefit from using a proxy or server-side fetch if CORS blocks this.
-        // However, standard fetch often works in Electron if webSecurity is disabled or specific headers are allowed.
-        // Assuming we can fetch directly for now.
-        
-        const [dailyRes, weeklyRes] = await Promise.all([
-             fetch(`https://api.anthropic.com/v1/usage_report/messages?${dailyParams}`, fetchOptions),
-             fetch(`https://api.anthropic.com/v1/usage_report/messages?${weeklyParams}`, fetchOptions)
+        const [sessionRes, weeklyRes] = await Promise.all([
+            fetch(`${baseUrl}?starting_at=${sessionStart}&ending_at=${endOfToday}&bucket_width=1h`, fetchOptions),
+            fetch(`${baseUrl}?starting_at=${weeklyStart}&ending_at=${endOfToday}&bucket_width=1d`, fetchOptions)
         ]);
 
-        if (!dailyRes.ok) throw new Error(`Daily API: ${dailyRes.statusText}`);
-        if (!weeklyRes.ok) throw new Error(`Weekly API: ${weeklyRes.statusText}`);
+        if (!sessionRes.ok) {
+            const errText = await sessionRes.text();
+            throw new Error(`Session API ${sessionRes.status}: ${errText}`);
+        }
+        if (!weeklyRes.ok) {
+            const errText = await weeklyRes.text();
+            throw new Error(`Weekly API ${weeklyRes.status}: ${errText}`);
+        }
 
-        const dailyJson = await dailyRes.json();
+        const sessionJson = await sessionRes.json();
         const weeklyJson = await weeklyRes.json();
 
         return {
-            daily: this.aggregateTokens(dailyJson.data),
+            session: this.aggregateTokens(sessionJson.data),
             weekly: this.aggregateTokens(weeklyJson.data)
         };
     }
 
     aggregateTokens(data) {
-        let input = 0;
-        let output = 0;
-        if (!data) return { input, output };
-
+        let total = 0;
+        if (!data) return total;
         data.forEach(bucket => {
-            bucket.results.forEach(res => {
-                input += res.uncached_input_tokens || 0;
-                input += (res.cache_creation && res.cache_creation.ephemeral_1h_input_tokens) || 0; // Simplified cache counting
-                output += res.output_tokens || 0;
-            });
+            if (bucket.results) {
+                bucket.results.forEach(res => {
+                    total += res.uncached_input_tokens || 0;
+                    total += res.output_tokens || 0;
+                    if (res.cache_creation) {
+                        total += res.cache_creation.ephemeral_1h_input_tokens || 0;
+                        total += res.cache_creation.ephemeral_5m_input_tokens || 0;
+                    }
+                    total += res.cache_read_input_tokens || 0;
+                });
+            }
         });
-
-        return { input, output, total: input + output };
+        return total;
     }
 
     render(data) {
-        this.elem.innerHTML = `
+        const sessionLimit = this.secrets.sessionLimitTokens || 1000000;
+        const weeklyLimit = this.secrets.weeklyLimitTokens || 10000000;
+
+        const sessionPercent = Math.min(100, Math.round((data.session / sessionLimit) * 100));
+        const weeklyPercent = Math.min(100, Math.round((data.weekly / weeklyLimit) * 100));
+
+        this.contentEl.innerHTML = `
             <div class="claude-usage-section">
                 <div class="claude-usage-header">
-                    <span>TODAY'S USAGE</span>
-                    <span>${data.daily.total.toLocaleString()} TOKENS</span>
+                    <span>SESSION</span>
+                    <span>${sessionPercent}%</span>
                 </div>
                 <div class="claude-usage-bar-container">
-                    <div class="claude-usage-bar" style="width: 100%; opacity: 0.8;"></div>
+                    <div class="claude-usage-bar" style="width: ${sessionPercent}%;"></div>
                 </div>
                 <div class="claude-usage-details">
-                    In: ${data.daily.input.toLocaleString()} | Out: ${data.daily.output.toLocaleString()}
+                    ${data.session.toLocaleString()} / ${sessionLimit.toLocaleString()}
                 </div>
             </div>
-
             <div class="claude-usage-section">
                 <div class="claude-usage-header">
-                    <span>LAST 7 DAYS</span>
-                    <span>${data.weekly.total.toLocaleString()} TOKENS</span>
+                    <span>WEEKLY</span>
+                    <span>${weeklyPercent}%</span>
                 </div>
                 <div class="claude-usage-bar-container">
-                    <div class="claude-usage-bar" style="width: 100%; opacity: 0.6;"></div>
+                    <div class="claude-usage-bar" style="width: ${weeklyPercent}%;"></div>
                 </div>
                 <div class="claude-usage-details">
-                    Avg/Day: ${Math.round(data.weekly.total / 7).toLocaleString()}
+                    ${data.weekly.toLocaleString()} / ${weeklyLimit.toLocaleString()}
                 </div>
             </div>
         `;
     }
 
     renderError(msg) {
-        this.elem.innerHTML = `<div style="color:red; font-size: 0.8em; padding: 10px;">${msg}</div>`;
+        this.contentEl.innerHTML = `<div class="claude-usage-error">${msg}</div>`;
     }
 }
+
+module.exports = {
+    ClaudeUsage
+};
