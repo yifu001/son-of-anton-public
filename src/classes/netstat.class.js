@@ -58,8 +58,12 @@ class Netstat {
     }
     updateInfo() {
         window.si.networkInterfaces().then(async data => {
-            let offline = false;
+            if (!data || data.length === 0) {
+                this.setOffline("No network interfaces detected");
+                return;
+            }
 
+            let offline = false;
             let net = data[0];
             let netID = 0;
 
@@ -151,6 +155,13 @@ class Netstat {
                     document.querySelector("#mod_netstat_innercontainer > div:nth-child(3) > h2").innerHTML = Math.round(p)+"ms";
                 }
             }
+        }).catch(err => {
+            console.error("Netstat update error:", err);
+            this.offline = true;
+            document.getElementById("mod_netstat_iname").innerText = "Interface: (error)";
+            document.querySelector("#mod_netstat_innercontainer > div:first-child > h2").innerHTML = "OFFLINE";
+            document.querySelector("#mod_netstat_innercontainer > div:nth-child(2) > h2").innerHTML = "--.--.--.--";
+            document.querySelector("#mod_netstat_innercontainer > div:nth-child(3) > h2").innerHTML = "--ms";
         });
     }
     ping(target, port, local) {

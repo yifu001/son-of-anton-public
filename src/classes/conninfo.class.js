@@ -86,6 +86,11 @@ class Conninfo {
 
                 this.total.innerText = `${this._pb(data[0].tx_bytes)} OUT, ${this._pb(data[0].rx_bytes)} IN`.toUpperCase();
                 this.current.innerText = "UP " + parseFloat(data[0].tx_sec/125000).toFixed(2) + " DOWN " + parseFloat(data[0].rx_sec/125000).toFixed(2);
+            }).catch(err => {
+                console.error("Conninfo update error:", err);
+                this.series[0].append(time, 0);
+                this.series[1].append(time, 0);
+                document.querySelector("div#mod_conninfo").setAttribute("class", "offline");
             });
         }
     }

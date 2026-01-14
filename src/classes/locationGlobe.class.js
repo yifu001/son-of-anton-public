@@ -232,6 +232,8 @@ class LocationGlobe {
             newconns.forEach(ip => {
                 this.addConn(ip);
             });
+        }).catch(err => {
+            console.error("LocationGlobe connections update error:", err);
         });
     }
 }

@@ -26,43 +26,34 @@ class AgentList {
         const fs = require("fs");
 
         const homeDir = require("@electron/remote").app.getPath("home");
-        const brainDir = path.join(homeDir, ".gemini", "antigravity", "brain");
+        const claudeProjectsDir = path.join(homeDir, ".claude", "projects");
         const agents = [];
 
         try {
-            if (fs.existsSync(brainDir)) {
-                const folders = fs.readdirSync(brainDir);
-                folders.forEach(folder => {
-                    const fullPath = path.join(brainDir, folder);
-                    if (fs.statSync(fullPath).isDirectory() && folder.length === 36) {
-                        const taskFile = path.join(fullPath, "task.md");
-                        let currentTask = "No active task";
+            if (fs.existsSync(claudeProjectsDir)) {
+                // Scan all project directories for subagents
+                const projectDirs = fs.readdirSync(claudeProjectsDir);
+                projectDirs.forEach(projectDir => {
+                    const projectPath = path.join(claudeProjectsDir, projectDir);
+                    if (!fs.statSync(projectPath).isDirectory()) return;
 
-                        if (fs.existsSync(taskFile)) {
-                            const content = fs.readFileSync(taskFile, "utf-8");
-                            const lines = content.split("\n");
-                            // Find first line with [/] or first [ ] (not [x])
-                            for (let line of lines) {
-                                if (line.includes("[/]") || (line.includes("[ ]") && !line.includes("[x]"))) {
-                                    currentTask = line.replace(/\[\/?\s?\]/, "").replace(/^[-*]\s?/, "").trim();
-                                    break;
-                                }
+                    // Check for subagents folder
+                    const subagentsDir = path.join(projectPath, "subagents");
+                    if (fs.existsSync(subagentsDir)) {
+                        this.scanSubagentsDir(subagentsDir, agents, projectDir);
+                    }
+
+                    // Also check for session subdirectories that have subagents
+                    const sessionDirs = fs.readdirSync(projectPath);
+                    sessionDirs.forEach(sessionDir => {
+                        const sessionPath = path.join(projectPath, sessionDir);
+                        if (fs.statSync(sessionPath).isDirectory()) {
+                            const sessionSubagentsDir = path.join(sessionPath, "subagents");
+                            if (fs.existsSync(sessionSubagentsDir)) {
+                                this.scanSubagentsDir(sessionSubagentsDir, agents, projectDir);
                             }
                         }
-
-                        const stat = fs.statSync(fullPath);
-                        const isRecent = (Date.now() - stat.mtimeMs) < (1000 * 60 * 60 * 24); // Last 24h
-
-                        if (isRecent) {
-                            agents.push({
-                                id: folder,
-                                name: "Agent-" + folder.substring(0, 4),
-                                status: (Date.now() - stat.mtimeMs) < (1000 * 60 * 30) ? "ONLINE" : "OFFLINE",
-                                task: currentTask,
-                                mtime: stat.mtimeMs
-                            });
-                        }
-                    }
+                    });
                 });
             }
         } catch (e) {
@@ -72,6 +63,67 @@ class AgentList {
         // Sort by most recently active
         agents.sort((a, b) => b.mtime - a.mtime);
         this.render(agents.slice(0, 5));
+    }
+
+    scanSubagentsDir(subagentsDir, agents, projectDir) {
+        const path = require("path");
+        const fs = require("fs");
+
+        const agentFiles = fs.readdirSync(subagentsDir);
+        agentFiles.forEach(agentFile => {
+            if (!agentFile.startsWith("agent-") || !agentFile.endsWith(".jsonl")) return;
+
+            const agentPath = path.join(subagentsDir, agentFile);
+            const stat = fs.statSync(agentPath);
+            const isRecent = (Date.now() - stat.mtimeMs) < (1000 * 60 * 60 * 24); // Last 24h
+
+            if (!isRecent) return;
+
+            // Extract agent ID from filename (agent-a2a65de.jsonl -> a2a65de)
+            const agentId = agentFile.replace("agent-", "").replace(".jsonl", "");
+
+            // Try to get task description from first line of file
+            let taskDescription = "No active task";
+            try {
+                const content = fs.readFileSync(agentPath, "utf-8");
+                const firstLine = content.split("\n")[0];
+                if (firstLine) {
+                    const data = JSON.parse(firstLine);
+                    if (data.message && data.message.content) {
+                        // Get first 50 chars of the task
+                        const taskContent = typeof data.message.content === "string"
+                            ? data.message.content
+                            : (data.message.content[0]?.text || "");
+                        taskDescription = taskContent.substring(0, 60) + (taskContent.length > 60 ? "..." : "");
+                    }
+                }
+            } catch (e) {
+                // Ignore parse errors
+            }
+
+            // Avoid duplicates
+            if (!agents.find(a => a.id === agentId)) {
+                const timeSinceModified = Date.now() - stat.mtimeMs;
+                let status;
+                if (timeSinceModified < (1000 * 10)) {
+                    // Modified within last 10 seconds = actively running
+                    status = "ACTIVE";
+                } else if (timeSinceModified < (1000 * 60 * 30)) {
+                    // Modified within last 30 minutes = online but idle
+                    status = "ONLINE";
+                } else {
+                    status = "OFFLINE";
+                }
+
+                agents.push({
+                    id: agentId,
+                    name: "Agent-" + agentId,
+                    status: status,
+                    task: taskDescription,
+                    mtime: stat.mtimeMs
+                });
+            }
+        });
     }
 
     render(agents) {

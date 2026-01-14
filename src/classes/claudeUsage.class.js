@@ -24,23 +24,29 @@ class ClaudeUsage {
     }
 
     loadSecrets() {
+        // Load from window.settings (settings.json) - configured via Settings editor (Ctrl+Shift+S)
+        if (window.settings && window.settings.claudeApiKey) {
+            this.secrets = {
+                claudeApiKey: window.settings.claudeApiKey,
+                sessionLimitTokens: window.settings.sessionLimitTokens || 1000000,
+                weeklyLimitTokens: window.settings.weeklyLimitTokens || 10000000
+            };
+            return;
+        }
+
+        // Fallback: try secrets.json file for backwards compatibility
         const path = require("path");
         const fs = require("fs");
         try {
             const appPath = require("@electron/remote").app.getAppPath();
-
-            // Try project root (appPath)
             let secretsPath = path.join(appPath, "secrets.json");
 
-            // In development, appPath might be the 'src' folder or project root
             if (!fs.existsSync(secretsPath)) {
                 secretsPath = path.join(appPath, "..", "secrets.json");
             }
 
             if (fs.existsSync(secretsPath)) {
                 this.secrets = JSON.parse(fs.readFileSync(secretsPath, "utf-8"));
-            } else {
-                console.error("Secrets file not found at:", secretsPath);
             }
         } catch (e) {
             console.error("Failed to load secrets:", e);
@@ -49,7 +55,7 @@ class ClaudeUsage {
 
     async fetchUsageData() {
         if (!this.secrets.claudeApiKey) {
-            this.renderError("No API Key in secrets.json");
+            this.renderError("No API Key - Configure in Settings (Ctrl+Shift+S)");
             return;
         }
 
