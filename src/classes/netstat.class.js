@@ -25,7 +25,7 @@ class Netstat {
         </div>`;
 
         this.offline = false;
-        this.lastconn = {finished: false}; // Prevent geoip lookup attempt until maxminddb is loaded
+        this.lastconn = { finished: false }; // Prevent geoip lookup attempt until maxminddb is loaded
         this.iface = null;
         this.failedAttempts = {};
         this.runsBeforeGeoIPUpdate = 0;
@@ -48,9 +48,9 @@ class Netstat {
         let geolite2 = require("geolite2-redist");
         let maxmind = require("maxmind");
         geolite2.downloadDbs(require("path").join(require("@electron/remote").app.getPath("userData"), "geoIPcache")).then(() => {
-           geolite2.open('GeoLite2-City', path => {
+            geolite2.open('GeoLite2-City', path => {
                 return maxmind.open(path);
-            }).catch(e => {throw e}).then(lookup => {
+            }).catch(e => { throw e }).then(lookup => {
                 this.geoLookup = lookup;
                 this.lastconn.finished = true;
             });
@@ -113,13 +113,13 @@ class Netstat {
 
             this.iface = net.iface;
             this.internalIPv4 = net.ip4;
-            document.getElementById("mod_netstat_iname").innerText = "Interface: "+net.iface;
+            document.getElementById("mod_netstat_iname").innerText = "Interface: " + net.iface;
 
             if (net.ip4 === "127.0.0.1") {
                 offline = true;
             } else {
                 if (this.runsBeforeGeoIPUpdate === 0 && this.lastconn.finished) {
-                    this.lastconn = require("https").get({host: "myexternalip.com", port: 443, path: "/json", localAddress: net.ip4, agent: this._httpsAgent}, res => {
+                    this.lastconn = require("https").get({ host: "myexternalip.com", port: 443, path: "/json", localAddress: net.ip4, agent: this._httpsAgent }, res => {
                         let rawData = "";
                         res.on("data", chunk => {
                             rawData += chunk;
@@ -136,7 +136,7 @@ class Netstat {
                                 document.querySelector("#mod_netstat_innercontainer > div:nth-child(2) > h2").innerHTML = window._escapeHtml(ip);
 
                                 this.runsBeforeGeoIPUpdate = 10;
-                            } catch(e) {
+                            } catch (e) {
                                 this.failedAttempts[e] = (this.failedAttempts[e] || 0) + 1;
                                 if (this.failedAttempts[e] > 2) return false;
                                 console.warn(e);
@@ -165,7 +165,7 @@ class Netstat {
                     document.querySelector("#mod_netstat_innercontainer > div:nth-child(3) > h2").innerHTML = "--ms";
                 } else {
                     document.querySelector("#mod_netstat_innercontainer > div:first-child > h2").innerHTML = "ONLINE";
-                    document.querySelector("#mod_netstat_innercontainer > div:nth-child(3) > h2").innerHTML = Math.round(p)+"ms";
+                    document.querySelector("#mod_netstat_innercontainer > div:nth-child(3) > h2").innerHTML = Math.round(p) + "ms";
                 }
             }
         }).catch(err => {
@@ -197,7 +197,7 @@ class Netstat {
                 s.destroy();
                 reject(e);
             });
-            s.setTimeout(1900, function() {
+            s.setTimeout(1900, function () {
                 s.destroy();
                 reject(new Error("Socket timeout"));
             });
