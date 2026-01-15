@@ -2,9 +2,9 @@
     display: flex;
     flex-direction: column;
     padding: 10px;
-    margin-left: 20px;
+    margin-right: 20px;
     height: 100%;
-    width: 100%;
+    width: 90%;
 }
 
 #mod_claudeUsage > h1 {
