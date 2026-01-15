@@ -59,6 +59,9 @@ class ClaudeUsage {
             return;
         }
 
+        const keyPreview = this.secrets.claudeApiKey.substring(0, 15) + "...";
+        console.log("[ClaudeUsage] Using API key:", keyPreview);
+
         try {
             const usageData = await this.getUsageFromApi(this.secrets.claudeApiKey);
             this.render(usageData);
@@ -69,22 +72,7 @@ class ClaudeUsage {
     }
 
     async getUsageFromApi(apiKey) {
-        const now = new Date();
-
-        // Session: Last 5 hours (use 1h bucket for precision)
-        const sessionStart = new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString();
-
-        // Weekly: Since last Friday 6:00 AM (use 1d bucket)
-        let lastFriday = new Date(now);
-        lastFriday.setDate(now.getDate() - (now.getDay() + 2) % 7);
-        lastFriday.setHours(6, 0, 0, 0);
-        if (lastFriday > now) lastFriday.setDate(lastFriday.getDate() - 7);
-        const weeklyStart = lastFriday.toISOString();
-
-        const endOfToday = now.toISOString();
-
-        const baseUrl = "https://api.anthropic.com/v1/organizations/usage_report/messages";
-
+        const baseUrl = "https://api.anthropic.com/v1/organizations/usage_report/claude_code";
         const fetchOptions = {
             method: "GET",
             headers: {
@@ -93,42 +81,79 @@ class ClaudeUsage {
             }
         };
 
-        const [sessionRes, weeklyRes] = await Promise.all([
-            fetch(`${baseUrl}?starting_at=${sessionStart}&ending_at=${endOfToday}&bucket_width=1h`, fetchOptions),
-            fetch(`${baseUrl}?starting_at=${weeklyStart}&ending_at=${endOfToday}&bucket_width=1d`, fetchOptions)
-        ]);
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date();
+        const todayStr = today.toISOString().split("T")[0];
 
-        if (!sessionRes.ok) {
-            const errText = await sessionRes.text();
-            throw new Error(`Session API ${sessionRes.status}: ${errText}`);
-        }
-        if (!weeklyRes.ok) {
-            const errText = await weeklyRes.text();
-            throw new Error(`Weekly API ${weeklyRes.status}: ${errText}`);
-        }
+        // Get dates from last Friday to today for weekly usage
+        const weekDates = this.getDatesSinceLastFriday();
+        console.log("[ClaudeUsage] Fetching today:", todayStr);
+        console.log("[ClaudeUsage] Fetching weekly dates:", weekDates);
 
-        const sessionJson = await sessionRes.json();
-        const weeklyJson = await weeklyRes.json();
+        // Fetch today's data
+        const todayTokens = await this.fetchDayUsage(baseUrl, todayStr, fetchOptions);
+
+        // Fetch all days in parallel for weekly total
+        const weeklyResults = await Promise.all(
+            weekDates.map(date => this.fetchDayUsage(baseUrl, date, fetchOptions))
+        );
+        const weeklyTokens = weeklyResults.reduce((sum, val) => sum + val, 0);
+
+        console.log("[ClaudeUsage] Aggregated - Today:", todayTokens, "Weekly:", weeklyTokens);
 
         return {
-            session: this.aggregateTokens(sessionJson.data),
-            weekly: this.aggregateTokens(weeklyJson.data)
+            session: todayTokens,
+            weekly: weeklyTokens
         };
     }
 
-    aggregateTokens(data) {
+    getDatesSinceLastFriday() {
+        const dates = [];
+        const now = new Date();
+        let lastFriday = new Date(now);
+        lastFriday.setDate(now.getDate() - (now.getDay() + 2) % 7);
+        lastFriday.setHours(0, 0, 0, 0);
+        if (lastFriday > now) lastFriday.setDate(lastFriday.getDate() - 7);
+
+        // Collect all dates from lastFriday to today
+        const current = new Date(lastFriday);
+        while (current <= now) {
+            dates.push(current.toISOString().split("T")[0]);
+            current.setDate(current.getDate() + 1);
+        }
+        return dates;
+    }
+
+    async fetchDayUsage(baseUrl, dateStr, fetchOptions) {
+        try {
+            const res = await fetch(`${baseUrl}?starting_at=${dateStr}&limit=1000`, fetchOptions);
+            if (!res.ok) {
+                const errText = await res.text();
+                console.error(`[ClaudeUsage] API Error for ${dateStr}:`, res.status, errText);
+                throw new Error(`API ${res.status}: ${errText}`);
+            }
+            const json = await res.json();
+            console.log(`[ClaudeUsage] Response for ${dateStr}:`, JSON.stringify(json, null, 2));
+            return this.aggregateClaudeCodeTokens(json.data);
+        } catch (e) {
+            console.error(`[ClaudeUsage] Failed to fetch ${dateStr}:`, e);
+            return 0;
+        }
+    }
+
+    aggregateClaudeCodeTokens(data) {
         let total = 0;
-        if (!data) return total;
-        data.forEach(bucket => {
-            if (bucket.results) {
-                bucket.results.forEach(res => {
-                    total += res.uncached_input_tokens || 0;
-                    total += res.output_tokens || 0;
-                    if (res.cache_creation) {
-                        total += res.cache_creation.ephemeral_1h_input_tokens || 0;
-                        total += res.cache_creation.ephemeral_5m_input_tokens || 0;
+        if (!data || !Array.isArray(data)) return total;
+
+        data.forEach(record => {
+            if (record.model_breakdown && Array.isArray(record.model_breakdown)) {
+                record.model_breakdown.forEach(model => {
+                    if (model.tokens) {
+                        total += model.tokens.input || 0;
+                        total += model.tokens.output || 0;
+                        total += model.tokens.cache_creation || 0;
+                        total += model.tokens.cache_read || 0;
                     }
-                    total += res.cache_read_input_tokens || 0;
                 });
             }
         });
@@ -142,10 +167,12 @@ class ClaudeUsage {
         const sessionPercent = Math.min(100, Math.round((data.session / sessionLimit) * 100));
         const weeklyPercent = Math.min(100, Math.round((data.weekly / weeklyLimit) * 100));
 
+        const lastUpdated = new Date().toLocaleTimeString();
+
         this.contentEl.innerHTML = `
             <div class="claude-usage-section">
                 <div class="claude-usage-header">
-                    <span>SESSION</span>
+                    <span>TODAY</span>
                     <span>${sessionPercent}%</span>
                 </div>
                 <div class="claude-usage-bar-container">
@@ -166,6 +193,9 @@ class ClaudeUsage {
                 <div class="claude-usage-details">
                     ${data.weekly.toLocaleString()} / ${weeklyLimit.toLocaleString()}
                 </div>
+            </div>
+            <div class="claude-usage-details" style="margin-top: 10px; text-align: right;">
+                Updated: ${lastUpdated}
             </div>
         `;
     }

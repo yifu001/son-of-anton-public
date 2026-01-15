@@ -60,9 +60,10 @@ class AgentList {
             console.error("Agent Scan Error:", e);
         }
 
-        // Sort by most recently active
-        agents.sort((a, b) => b.mtime - a.mtime);
-        this.render(agents.slice(0, 5));
+        // Filter out offline agents and sort by most recently active
+        const activeAgents = agents.filter(a => a.status !== "OFFLINE");
+        activeAgents.sort((a, b) => b.mtime - a.mtime);
+        this.render(activeAgents.slice(0, 5));
     }
 
     scanSubagentsDir(subagentsDir, agents, projectDir) {
