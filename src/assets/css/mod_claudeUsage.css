@@ -3,11 +3,13 @@
     flex-direction: column;
     padding: 10px;
     margin-right: 20px;
+    transform: scale(0.9);
+    transform-origin: right center;
     height: 100%;
     width: 90%;
 }
 
-#mod_claudeUsage > h1 {
+#mod_claudeUsage>h1 {
     font-size: 0.9em;
     color: var(--color_main);
     margin: 0 0 10px 0;
