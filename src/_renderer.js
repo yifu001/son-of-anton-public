@@ -435,8 +435,8 @@ async function initUI() {
     window.mods.netstat = new Netstat("mod_column_right");
     window.mods.globe = new LocationGlobe("mod_column_right");
     window.mods.conninfo = new Conninfo("mod_column_right");
-    window.mods.agentList = new AgentList("mod_column_right");
-    window.mods.claudeUsage = new ClaudeUsage("mod_column_left");
+    window.mods.agentList = new AgentList("mod_column_left");
+    window.mods.claudeUsage = new ClaudeUsage("mod_column_right");
 
     // Fade-in animations
     document.querySelectorAll(".mod_column").forEach(e => {
