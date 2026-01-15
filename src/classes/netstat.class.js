@@ -58,8 +58,15 @@ class Netstat {
     }
     updateInfo() {
         window.si.networkInterfaces().then(async data => {
+            console.log("[Netstat] Interfaces detected:", JSON.stringify(data, null, 2));
             if (!data || data.length === 0) {
-                this.setOffline("No network interfaces detected");
+                console.log("[Netstat] No network interfaces detected");
+                this.iface = null;
+                this.offline = true;
+                document.getElementById("mod_netstat_iname").innerText = "Interface: (offline)";
+                document.querySelector("#mod_netstat_innercontainer > div:first-child > h2").innerHTML = "OFFLINE";
+                document.querySelector("#mod_netstat_innercontainer > div:nth-child(2) > h2").innerHTML = "--.--.--.--";
+                document.querySelector("#mod_netstat_innercontainer > div:nth-child(3) > h2").innerHTML = "--ms";
                 return;
             }
 
@@ -80,13 +87,15 @@ class Netstat {
                 }
             } else {
                 // Find the first external, IPv4 connected networkInterface that has a MAC address set
-
+                console.log("[Netstat] Searching for valid interface...");
                 while (net.operstate !== "up" || net.internal === true || net.ip4 === "" || net.mac === "") {
+                    console.log(`[Netstat] Skipping ${net.iface}: operstate=${net.operstate}, internal=${net.internal}, ip4=${net.ip4}, mac=${net.mac}`);
                     netID++;
                     if (data[netID]) {
                         net = data[netID];
                     } else {
                         // No external connection!
+                        console.log("[Netstat] No valid interface found - going offline");
                         this.iface = null;
                         document.getElementById("mod_netstat_iname").innerText = "Interface: (offline)";
 
@@ -97,6 +106,7 @@ class Netstat {
                         break;
                     }
                 }
+                if (!this.offline) console.log(`[Netstat] Selected interface: ${net.iface}, ip4=${net.ip4}`);
             }
 
             if (net.ip4 !== this.internalIPv4) this.runsBeforeGeoIPUpdate = 0;
@@ -143,7 +153,10 @@ class Netstat {
                     this.runsBeforeGeoIPUpdate = this.runsBeforeGeoIPUpdate - 1;
                 }
 
-                let p = await this.ping(window.settings.pingAddr || "1.1.1.1", 80, net.ip4).catch(() => { offline = true });
+                let p = await this.ping(window.settings.pingAddr || "1.1.1.1", 80, net.ip4).catch((e) => {
+                    console.log(`[Netstat] Ping failed: ${e.message}`);
+                    offline = true;
+                });
 
                 this.offline = offline;
                 if (offline) {

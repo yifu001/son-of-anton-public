@@ -19,8 +19,8 @@ class ClaudeUsage {
         this.loadSecrets();
         await this.fetchUsageData();
 
-        // Refresh every hour
-        setInterval(() => this.fetchUsageData(), 1000 * 60 * 60);
+        // Refresh every 5 minutes
+        setInterval(() => this.fetchUsageData(), 1000 * 60 * 5);
     }
 
     loadSecrets() {
