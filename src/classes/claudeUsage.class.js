@@ -3,6 +3,8 @@ class ClaudeUsage {
         if (!parentId) throw "Missing parameters";
 
         this.secrets = {};
+        this.lastData = null;
+        this.refreshInterval = null;
         this.parent = document.getElementById(parentId);
         this.parent.innerHTML += `<div id="mod_claudeUsage">
             <h1>CLAUDE USAGE</h1>
@@ -19,8 +21,12 @@ class ClaudeUsage {
         this.loadSecrets();
         await this.fetchUsageData();
 
-        // Refresh every 5 minutes
-        setInterval(() => this.fetchUsageData(), 1000 * 60 * 5);
+        // Refresh every 5 minutes (300000ms)
+        if (this.refreshInterval) clearInterval(this.refreshInterval);
+        this.refreshInterval = setInterval(() => {
+            console.log("[ClaudeUsage] Auto-refresh triggered");
+            this.fetchUsageData();
+        }, 300000);
     }
 
     loadSecrets() {
@@ -31,6 +37,7 @@ class ClaudeUsage {
                 sessionLimitTokens: window.settings.sessionLimitTokens || 1000000,
                 weeklyLimitTokens: window.settings.weeklyLimitTokens || 10000000
             };
+            console.log("[ClaudeUsage] Loaded API key from settings");
             return;
         }
 
@@ -47,6 +54,7 @@ class ClaudeUsage {
 
             if (fs.existsSync(secretsPath)) {
                 this.secrets = JSON.parse(fs.readFileSync(secretsPath, "utf-8"));
+                console.log("[ClaudeUsage] Loaded API key from secrets.json");
             }
         } catch (e) {
             console.error("Failed to load secrets:", e);
@@ -60,14 +68,20 @@ class ClaudeUsage {
         }
 
         const keyPreview = this.secrets.claudeApiKey.substring(0, 15) + "...";
-        console.log("[ClaudeUsage] Using API key:", keyPreview);
+        console.log("[ClaudeUsage] Fetching usage data with key:", keyPreview);
 
         try {
             const usageData = await this.getUsageFromApi(this.secrets.claudeApiKey);
+            this.lastData = usageData;
             this.render(usageData);
         } catch (e) {
             console.error("Claude Usage API Error:", e);
-            this.renderError("API Error: " + e.message);
+            // If we have cached data, show it with error indicator
+            if (this.lastData) {
+                this.render(this.lastData, true);
+            } else {
+                this.renderError("API Error: " + e.message);
+            }
         }
     }
 
@@ -87,8 +101,8 @@ class ClaudeUsage {
 
         // Get dates from last Friday to today for weekly usage
         const weekDates = this.getDatesSinceLastFriday();
-        console.log("[ClaudeUsage] Fetching today:", todayStr);
-        console.log("[ClaudeUsage] Fetching weekly dates:", weekDates);
+        console.log("[ClaudeUsage] Today:", todayStr);
+        console.log("[ClaudeUsage] Weekly dates:", weekDates);
 
         // Fetch today's data
         const todayTokens = await this.fetchDayUsage(baseUrl, todayStr, fetchOptions);
@@ -99,7 +113,7 @@ class ClaudeUsage {
         );
         const weeklyTokens = weeklyResults.reduce((sum, val) => sum + val, 0);
 
-        console.log("[ClaudeUsage] Aggregated - Today:", todayTokens, "Weekly:", weeklyTokens);
+        console.log("[ClaudeUsage] Results - Today:", todayTokens, "Weekly:", weeklyTokens);
 
         return {
             session: todayTokens,
@@ -110,10 +124,18 @@ class ClaudeUsage {
     getDatesSinceLastFriday() {
         const dates = [];
         const now = new Date();
+
+        // Calculate last Friday (or today if today is Friday)
         let lastFriday = new Date(now);
-        lastFriday.setDate(now.getDate() - (now.getDay() + 2) % 7);
+        const dayOfWeek = now.getDay(); // 0 = Sunday, 5 = Friday
+        const daysToSubtract = (dayOfWeek + 2) % 7; // Days since last Friday
+        lastFriday.setDate(now.getDate() - daysToSubtract);
         lastFriday.setHours(0, 0, 0, 0);
-        if (lastFriday > now) lastFriday.setDate(lastFriday.getDate() - 7);
+
+        // If calculated Friday is in the future, go back a week
+        if (lastFriday > now) {
+            lastFriday.setDate(lastFriday.getDate() - 7);
+        }
 
         // Collect all dates from lastFriday to today
         const current = new Date(lastFriday);
@@ -130,11 +152,13 @@ class ClaudeUsage {
             if (!res.ok) {
                 const errText = await res.text();
                 console.error(`[ClaudeUsage] API Error for ${dateStr}:`, res.status, errText);
-                throw new Error(`API ${res.status}: ${errText}`);
+                // Don't throw, just return 0 for this day
+                return 0;
             }
             const json = await res.json();
-            console.log(`[ClaudeUsage] Response for ${dateStr}:`, JSON.stringify(json, null, 2));
-            return this.aggregateClaudeCodeTokens(json.data);
+            const tokens = this.aggregateClaudeCodeTokens(json.data);
+            console.log(`[ClaudeUsage] ${dateStr}: ${tokens} tokens`);
+            return tokens;
         } catch (e) {
             console.error(`[ClaudeUsage] Failed to fetch ${dateStr}:`, e);
             return 0;
@@ -156,11 +180,18 @@ class ClaudeUsage {
                     }
                 });
             }
+            // Also check for direct tokens field in case API format varies
+            if (record.tokens) {
+                total += record.tokens.input || 0;
+                total += record.tokens.output || 0;
+                total += record.tokens.cache_creation || 0;
+                total += record.tokens.cache_read || 0;
+            }
         });
         return total;
     }
 
-    render(data) {
+    render(data, isStale = false) {
         const sessionLimit = this.secrets.sessionLimitTokens || 1000000;
         const weeklyLimit = this.secrets.weeklyLimitTokens || 10000000;
 
@@ -168,6 +199,7 @@ class ClaudeUsage {
         const weeklyPercent = Math.min(100, Math.round((data.weekly / weeklyLimit) * 100));
 
         const lastUpdated = new Date().toLocaleTimeString();
+        const staleIndicator = isStale ? ' (STALE)' : '';
 
         this.contentEl.innerHTML = `
             <div class="claude-usage-section">
@@ -195,19 +227,18 @@ class ClaudeUsage {
                 </div>
             </div>
             <div class="claude-usage-details" style="margin-top: 10px; text-align: right;">
-                Updated: ${lastUpdated}
+                Updated: ${lastUpdated}${staleIndicator}
             </div>
         `;
     }
 
     renderError(msg) {
-        const div = document.createElement('div');
-        div.className = 'claude-usage-error';
-        div.textContent = msg;
-        this.contentEl.innerHTML = '';
-        this.contentEl.appendChild(div);
+        this.contentEl.innerHTML = `<div class="claude-usage-error">${msg}</div>`;
+    }
+
+    // Manual refresh method
+    refresh() {
+        console.log("[ClaudeUsage] Manual refresh requested");
+        this.fetchUsageData();
     }
 }
-
-
-// window.ClaudeUsage = ClaudeUsage;

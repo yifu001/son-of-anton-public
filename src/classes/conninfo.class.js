@@ -63,14 +63,17 @@ class Conninfo {
     }
     updateInfo() {
         let time = new Date().getTime();
+        const conninfoEl = document.querySelector("div#mod_conninfo");
 
         if (window.mods.netstat.offline || window.mods.netstat.iface === null) {
             this.series[0].append(time, 0);
             this.series[1].append(time, 0);
-            document.querySelector("div#mod_conninfo").setAttribute("class", "offline");
+            // Hide the entire network traffic module when offline
+            conninfoEl.style.display = "none";
             return;
         } else {
-            document.querySelector("div#mod_conninfo").setAttribute("class", "");
+            // Show the module when online
+            conninfoEl.style.display = "";
             window.si.networkStats(window.mods.netstat.iface).then(data => {
 
                 let max0 = this.series[0].maxValue;

@@ -171,23 +171,36 @@ class LocationGlobe {
     }
     updateLoc() {
         if (window.mods.netstat.offline) {
-            document.querySelector("div#mod_globe").setAttribute("class", "offline");
-            document.querySelector("i.mod_globe_headerInfo").innerText = "(OFFLINE)";
-
-            this.removePins();
-            this.removeMarkers();
-            this.conns = [];
-            this.lastgeo = {
-                latitude: 0,
-                longitude: 0
-            };
+            // Use mock data when offline to keep globe active
+            this.updateWithMockData();
         } else {
             this.updateConOnlineConnection().then(() => {
                 document.querySelector("div#mod_globe").setAttribute("class", "");
             }).catch(() => {
-                document.querySelector("i.mod_globe_headerInfo").innerText = "UNKNOWN";
+                // Fallback to mock data on connection error
+                this.updateWithMockData();
             })
         }
+    }
+    updateWithMockData() {
+        // Mock location data (San Francisco coordinates as default)
+        const mockGeo = {
+            latitude: 37.7749,
+            longitude: -122.4194
+        };
+
+        document.querySelector("div#mod_globe").setAttribute("class", "");
+        document.querySelector("i.mod_globe_headerInfo").innerText = `${mockGeo.latitude}, ${mockGeo.longitude} (MOCK)`;
+
+        if (mockGeo.latitude !== this.lastgeo.latitude || mockGeo.longitude !== this.lastgeo.longitude) {
+            this.removePins();
+            this.removeMarkers();
+            this.conns = [];
+
+            this._locPin = this.globe.addPin(mockGeo.latitude, mockGeo.longitude, "", 1.2);
+            this._locMarker = this.globe.addMarker(mockGeo.latitude, mockGeo.longitude, "", false, 1.2);
+        }
+        this.lastgeo = mockGeo;
     }
     async updateConOnlineConnection() {
         let newgeo = window.mods.netstat.ipinfo.geo;
