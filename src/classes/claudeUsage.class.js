@@ -201,7 +201,11 @@ class ClaudeUsage {
     }
 
     renderError(msg) {
-        this.contentEl.innerHTML = `<div class="claude-usage-error">${msg}</div>`;
+        const div = document.createElement('div');
+        div.className = 'claude-usage-error';
+        div.textContent = msg;
+        this.contentEl.innerHTML = '';
+        this.contentEl.appendChild(div);
     }
 }
 
