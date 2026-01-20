@@ -1000,6 +1000,11 @@ window.openSettings = async () => {
                         <td>Weekly token limit for Claude usage display</td>
                         <td><input type="number" id="settingsEditor-weeklyLimitTokens" value="${window.settings.weeklyLimitTokens || 10000000}"></td>
                     </tr>
+                    <tr>
+                        <td>contextWarningThreshold</td>
+                        <td>Context usage percentage to trigger warning (0-100)</td>
+                        <td><input type="number" id="settingsEditor-contextWarningThreshold" value="${window.settings.contextWarningThreshold || 80}" min="0" max="100"></td>
+                    </tr>
                 </table>
                 <h6 id="settingsEditorStatus">Loaded values from memory</h6>
                 <br>`,
@@ -1056,7 +1061,8 @@ window.writeSettingsFile = () => {
         experimentalFeatures: (document.getElementById("settingsEditor-experimentalFeatures").value === "true"),
         claudeApiKey: document.getElementById("settingsEditor-claudeApiKey").value,
         sessionLimitTokens: Number(document.getElementById("settingsEditor-sessionLimitTokens").value) || 1000000,
-        weeklyLimitTokens: Number(document.getElementById("settingsEditor-weeklyLimitTokens").value) || 10000000
+        weeklyLimitTokens: Number(document.getElementById("settingsEditor-weeklyLimitTokens").value) || 10000000,
+        contextWarningThreshold: Number(document.getElementById("settingsEditor-contextWarningThreshold")?.value) || 80
     };
 
     Object.keys(window.settings).forEach(key => {
