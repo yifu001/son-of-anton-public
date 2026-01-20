@@ -74,6 +74,42 @@ window.saveTerminalNames = () => {
     }
 };
 
+window.enableTabRename = (tabIndex) => {
+    const tabElement = document.getElementById(`shell_tab${tabIndex}`);
+    const textElement = tabElement.querySelector('p');
+
+    textElement.addEventListener('dblclick', (e) => {
+        e.stopPropagation(); // Prevent tab switch
+        textElement.setAttribute('contenteditable', 'true');
+        textElement.focus();
+        // Select all text for easy replacement
+        const range = document.createRange();
+        range.selectNodeContents(textElement);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+    });
+
+    textElement.addEventListener('blur', () => {
+        textElement.removeAttribute('contenteditable');
+        let newName = textElement.innerText.trim().substring(0, 20); // Max 20 chars
+        if (!newName) newName = tabIndex === 0 ? "MAIN SHELL" : "EMPTY";
+        window.terminalNames[tabIndex] = newName;
+        textElement.innerHTML = window._escapeHtml(newName);
+        window.saveTerminalNames();
+    });
+
+    textElement.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            textElement.blur(); // Triggers save via blur handler
+        } else if (e.key === 'Escape') {
+            // Revert to saved name
+            textElement.innerText = window.terminalNames[tabIndex];
+            textElement.blur();
+        }
+    });
+};
+
 // Load CLI parameters
 if (remote.process.argv.includes("--nointro")) {
     window.settings.nointroOverride = true;
@@ -514,6 +550,10 @@ async function initUI() {
             document.getElementById("shell_tab0").querySelector('p').innerHTML = `MAIN - ${p}`;
         }
     };
+    // Enable rename on all tabs
+    for (let i = 0; i < 5; i++) {
+        window.enableTabRename(i);
+    }
     // Prevent losing hardware keyboard focus on the terminal when using touch keyboard
     window.onmouseup = e => {
         // if (window.keyboard.linkedToTerm) window.term[window.currentTerm].term.focus();
@@ -686,6 +726,7 @@ window.focusShellTab = number => {
                 };
 
                 document.getElementById("shell_tab" + number).innerHTML = `<p>::${port}</p>`;
+                window.enableTabRename(number);
                 setTimeout(() => {
                     window.focusShellTab(number);
                 }, 500);
