@@ -37,12 +37,14 @@ const url = require("url");
 const fs = require("fs");
 const which = require("which");
 const Terminal = require("./classes/terminal.class.js").Terminal;
+const ClaudeStateManager = require("./classes/claudeState.class.js");
 
 ipc.on("log", (e, type, content) => {
     signale[type](content);
 });
 
 var win, tty, extraTtys;
+var claudeStateManager = null;
 const settingsFile = path.join(electron.app.getPath("userData"), "settings.json");
 const shortcutsFile = path.join(electron.app.getPath("userData"), "shortcuts.json");
 const lastWindowStateFile = path.join(electron.app.getPath("userData"), "lastWindowState.json");
@@ -217,6 +219,13 @@ function createWindow(settings) {
         win.setFullScreen(false);
     }
 
+    // Initialize Claude state manager after window is ready
+    win.webContents.on('did-finish-load', () => {
+        claudeStateManager = new ClaudeStateManager(win);
+        claudeStateManager.start();
+        signale.success("Claude state manager initialized");
+    });
+
     signale.watch("Waiting for frontend connection...");
 }
 
@@ -365,6 +374,9 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', () => {
+    if (claudeStateManager) {
+        claudeStateManager.stop();
+    }
     tty.close();
     Object.keys(extraTtys).forEach(key => {
         if (extraTtys[key] !== null) {
