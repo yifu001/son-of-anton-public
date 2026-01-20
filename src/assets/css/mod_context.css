@@ -56,15 +56,65 @@ div#mod_context_content {
     padding: 0.5vh 0;
 }
 
-div#mod_context .context-placeholder {
+/* Context Display Container */
+div#mod_context .context-display {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    padding: 1vh 0;
+    padding: 0.5vh 0;
 }
 
-div#mod_context .context-placeholder-text {
+/* Token Count Text */
+div#mod_context .context-text {
     font-size: 1.4vh;
-    opacity: 0.5;
     color: rgba(var(--color_r), var(--color_g), var(--color_b), 1);
+    margin-bottom: 0.5vh;
+    text-align: center;
+}
+
+/* Progress Bar Base */
+progress.context-progress {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 90%;
+    height: 0.6vh;
+    border: none;
+    border-right: 0.1vh solid rgba(var(--color_r), var(--color_g), var(--color_b), 0.8);
+}
+
+/* Progress Bar Track */
+progress.context-progress::-webkit-progress-bar {
+    background: rgba(var(--color_r), var(--color_g), var(--color_b), 0.2);
+    height: 0.3vh;
+}
+
+/* Progress Bar Fill with Gradient (green -> yellow -> red) */
+progress.context-progress::-webkit-progress-value {
+    background: linear-gradient(
+        to right,
+        #22c55e 0%,
+        #22c55e 40%,
+        #eab308 60%,
+        #eab308 75%,
+        #ef4444 90%,
+        #ef4444 100%
+    );
+    height: 0.5vh;
+    transition: width 0.3s ease-out;
+    position: relative;
+    bottom: 0.1vh;
+}
+
+/* Warning State (solid red when over threshold) */
+div#mod_context.warning .context-text {
+    color: #ef4444;
+}
+
+div#mod_context.warning progress.context-progress::-webkit-progress-value {
+    background: #ef4444;
+}
+
+/* Stale Data State (dimmed) */
+div#mod_context.stale {
+    opacity: 0.5;
 }
