@@ -43,9 +43,9 @@
 
 ### Terminal Management
 
-- [ ] **TERM-01**: Terminal names are user-editable (click to rename)
-- [ ] **TERM-02**: Active terminal highlighted (receives voice input)
-- [ ] **TERM-03**: Terminal tab shows custom name persistently
+- [x] **TERM-01**: Terminal names are user-editable (click to rename)
+- [x] **TERM-02**: Active terminal highlighted (receives voice input)
+- [x] **TERM-03**: Terminal tab shows custom name persistently
 
 ### Bug Fixes
 
@@ -113,9 +113,9 @@
 | TOOL-01 | 8 | Pending |
 | TOOL-02 | 8 | Pending |
 | TOOL-03 | 8 | Pending |
-| TERM-01 | 2 | Pending |
-| TERM-02 | 2 | Pending |
-| TERM-03 | 2 | Pending |
+| TERM-01 | 2 | Complete |
+| TERM-02 | 2 | Complete |
+| TERM-03 | 2 | Complete |
 | FIX-01 | 1 | Complete |
 | FIX-02 | 1 | Complete |
 | FIX-03 | 1 | Complete |
