@@ -17,7 +17,7 @@
 
 - [ ] **CTX-01**: Context widget displays progress bar showing usage percentage
 - [ ] **CTX-02**: Context widget displays token count (e.g., "125k / 200k")
-- [ ] **CTX-03**: Each of 5 terminals tracks context independently
+- [x] **CTX-03**: Each of 5 terminals tracks context independently
 - [ ] **CTX-04**: Low context warning triggers at configurable threshold (default 80%)
 - [x] **CTX-05**: Context widget replaces Claude usage widget on right side
 
@@ -99,7 +99,7 @@
 | VOICE-05 | 10 | Pending |
 | CTX-01 | 5 | Pending |
 | CTX-02 | 5 | Pending |
-| CTX-03 | 4 | Pending |
+| CTX-03 | 4 | Complete |
 | CTX-04 | 5 | Pending |
 | CTX-05 | 3 | Complete |
 | AGENT-01 | 6 | Pending |

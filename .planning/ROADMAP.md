@@ -107,7 +107,9 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 04-01-PLAN.md — Create ClaudeStateManager with file watching, IPC pipeline, and terminal-session mapping
+- [x] 04-01-PLAN.md — Create ClaudeStateManager with file watching, IPC pipeline, and terminal-session mapping
+
+**Status:** Complete (2026-01-20)
 
 ---
 
@@ -239,7 +241,7 @@ Plans:
 | 1 | Bug Fixes | ✓ Complete | 3 |
 | 2 | Terminal Management | ✓ Complete | 3 |
 | 3 | UI Layout Restructure | ✓ Complete | 2 |
-| 4 | Claude Code State Infrastructure | Planned | 1 |
+| 4 | Claude Code State Infrastructure | ✓ Complete | 1 |
 | 5 | Context Tracking Display | Pending | 3 |
 | 6 | Agent Visibility | Pending | 4 |
 | 7 | Todo Display | Pending | 3 |
