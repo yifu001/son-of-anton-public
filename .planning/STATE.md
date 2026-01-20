@@ -30,17 +30,17 @@ See: .planning/PROJECT.md
 ## Current Position
 
 - **Phase:** 1 of 10 (Bug Fixes)
-- **Plan:** 1 of 3 complete
+- **Plan:** 2 of 3 complete
 - **Status:** In progress
-- **Last activity:** 2026-01-20 - Completed 01-01-PLAN.md
+- **Last activity:** 2026-01-20 - Completed 01-02-PLAN.md
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
 | Phases completed | 0 |
-| Requirements delivered | 1/27 |
-| Plans executed | 1 |
+| Requirements delivered | 2/27 |
+| Plans executed | 2 |
 
 ## Accumulated Context
 
@@ -48,6 +48,9 @@ See: .planning/PROJECT.md
 - Accept operstate='unknown' on Windows for network interface detection
 - Prioritize private IP ranges: 192.168.x > 10.x > 172.16-31.x > other
 - Apply interface prioritization only on Windows (multiple interfaces common)
+- Use prompt parsing (not WMI/PowerShell) for Windows CWD tracking
+- Regex patterns for both cmd.exe and PowerShell prompts
+- Add retry loop in globe updateLoc when ipinfo not yet populated
 
 ### Technical Notes
 - Node 16.x required (Electron 12 ABI compatibility)
@@ -55,6 +58,7 @@ See: .planning/PROJECT.md
 - chokidar@3.5.3 for file watching (Windows race condition handling)
 - @picovoice/porcupine-web for wake word (WASM, not Node version)
 - Platform detection: require('os').type() === 'Windows_NT'
+- Windows prompt patterns: /^PS ([A-Z]:\\[^>\r\n]*?)>\s*$/m (PowerShell), /^([A-Z]:\\[^>\r\n]*?)>\s*$/m (cmd)
 
 ### Blockers
 - (none)
@@ -64,8 +68,8 @@ See: .planning/PROJECT.md
 
 ## Session Continuity
 
-**Last session:** 2026-01-20T17:21:33Z
-**Stopped at:** Completed 01-01-PLAN.md
+**Last session:** 2026-01-20T17:26:17Z
+**Stopped at:** Completed 01-02-PLAN.md
 **Resume file:** None
 
 ---
