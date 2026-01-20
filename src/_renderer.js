@@ -74,6 +74,10 @@ window.saveTerminalNames = () => {
     }
 };
 
+// Claude state tracking - maps terminal index to Claude session ID
+window.terminalSessions = {};  // { terminalIndex: sessionId }
+window.claudeState = null;     // Latest state from main process
+
 window.enableTabRename = (tabIndex) => {
     const tabElement = document.getElementById(`shell_tab${tabIndex}`);
     const textElement = tabElement.querySelector('p');
@@ -141,6 +145,47 @@ ipc.once("getKbOverride", (e, layout) => {
     }
 });
 ipc.send("getKbOverride");
+
+// Claude state updates from main process
+ipc.on('claude-state-update', (event, state) => {
+    window.claudeState = state;
+
+    // Map each active terminal to a Claude session based on CWD
+    for (let i = 0; i < 5; i++) {
+        if (window.term && window.term[i] && window.term[i].cwd) {
+            const sessionId = findSessionForCwd(window.term[i].cwd, state.projects);
+            if (sessionId) {
+                window.terminalSessions[i] = sessionId;
+            } else {
+                delete window.terminalSessions[i];
+            }
+        }
+    }
+
+    // Emit custom event for widgets to listen to (future phases)
+    window.dispatchEvent(new CustomEvent('claude-state-changed', { detail: state }));
+});
+
+// Helper: Find Claude session ID for a given CWD
+function findSessionForCwd(cwd, projects) {
+    if (!cwd || !projects) return null;
+
+    const normalizedCwd = cwd.replace(/\\/g, '/').toLowerCase();
+    let bestMatch = null;
+    let bestMatchLen = 0;
+
+    for (const [projPath, projData] of Object.entries(projects)) {
+        const normalizedProj = projPath.replace(/\\/g, '/').toLowerCase();
+        if (normalizedCwd.startsWith(normalizedProj) &&
+            normalizedProj.length > bestMatchLen &&
+            projData.lastSessionId) {
+            bestMatch = projData.lastSessionId;
+            bestMatchLen = normalizedProj.length;
+        }
+    }
+
+    return bestMatch;
+}
 
 // Load UI theme
 window._loadTheme = theme => {
