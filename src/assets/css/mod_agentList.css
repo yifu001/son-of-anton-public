@@ -2,11 +2,12 @@
     display: flex;
     flex-direction: column;
     padding: 10px;
-    margin-left: 20px;
-    transform: scale(0.9);
+    margin-left: 0;
+    margin-right: 0;
+    transform: translateX(5px);  /* 5px right shift without affecting layout */
     transform-origin: left center;
     height: 100%;
-    width: 90%;
+    width: 100%;  /* Full width */
 }
 
 #mod_agentList>h1 {
