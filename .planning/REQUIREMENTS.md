@@ -19,7 +19,7 @@
 - [ ] **CTX-02**: Context widget displays token count (e.g., "125k / 200k")
 - [ ] **CTX-03**: Each of 5 terminals tracks context independently
 - [ ] **CTX-04**: Low context warning triggers at configurable threshold (default 80%)
-- [ ] **CTX-05**: Context widget replaces Claude usage widget on right side
+- [x] **CTX-05**: Context widget replaces Claude usage widget on right side
 
 ### Agent Visibility
 
@@ -27,7 +27,7 @@
 - [ ] **AGENT-02**: Agent status colors: yellow=online/running, green=complete
 - [ ] **AGENT-03**: Agent list shows task description for each agent
 - [ ] **AGENT-04**: Agent list shows progress indicator for running agents
-- [ ] **AGENT-05**: Agent list UI at 100% width, shifted 5px right (overlap allowed)
+- [x] **AGENT-05**: Agent list UI at 100% width, shifted 5px right (overlap allowed)
 
 ### Todo Display
 
@@ -101,12 +101,12 @@
 | CTX-02 | 5 | Pending |
 | CTX-03 | 4 | Pending |
 | CTX-04 | 5 | Pending |
-| CTX-05 | 3 | Pending |
+| CTX-05 | 3 | Complete |
 | AGENT-01 | 6 | Pending |
 | AGENT-02 | 6 | Pending |
 | AGENT-03 | 6 | Pending |
 | AGENT-04 | 6 | Pending |
-| AGENT-05 | 3 | Pending |
+| AGENT-05 | 3 | Complete |
 | TODO-01 | 7 | Pending |
 | TODO-02 | 7 | Pending |
 | TODO-03 | 7 | Pending |
