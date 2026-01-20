@@ -27,6 +27,12 @@ This roadmap delivers a Claude Code command center in 10 phases: starting with q
 
 **Dependencies:** None
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md - Fix Windows network interface detection in netstat
+- [ ] 01-02-PLAN.md - Fix globe mock data fallback and Windows CWD tracking
+
 ---
 
 ## Phase 2: Terminal Management
@@ -209,7 +215,7 @@ This roadmap delivers a Claude Code command center in 10 phases: starting with q
 
 | Phase | Name | Status | Requirements |
 |-------|------|--------|--------------|
-| 1 | Bug Fixes | Pending | 3 |
+| 1 | Bug Fixes | Planned | 3 |
 | 2 | Terminal Management | Pending | 3 |
 | 3 | UI Layout Restructure | Pending | 2 |
 | 4 | Claude Code State Infrastructure | Pending | 1 |
@@ -227,19 +233,19 @@ This roadmap delivers a Claude Code command center in 10 phases: starting with q
 ## Dependency Graph
 
 ```
-Phase 1 (Bug Fixes)        ─────────────────────────────────┐
-Phase 2 (Terminal Mgmt)    ────┬───────────────────────────┐│
-Phase 3 (UI Layout)        ────│─────────┬─────────────────││
-                               │         │                 ││
-Phase 4 (State Infra)      ────┴─────────┼─────────────────┤│
-                                         │                 ││
-Phase 5 (Context)          ──────────────┴─────────┬───────┤│
-Phase 6 (Agents)           ────────────────────────│───────┤│
-Phase 7 (Todo)             ────────────────────────┴───┬───┤│
-Phase 8 (Tools)            ────────────────────────────┴───┘│
-                                                            │
-Phase 9 (Voice Foundation) ─────────────────────────────────┤
-Phase 10 (Voice Integration) ───────────────────────────────┘
+Phase 1 (Bug Fixes)        ---------------------------------+
+Phase 2 (Terminal Mgmt)    ----+---------------------------+|
+Phase 3 (UI Layout)        ----|----------+-----------------||
+                               |          |                 ||
+Phase 4 (State Infra)      ----+----------+-----------------+|
+                                          |                 ||
+Phase 5 (Context)          ---------------+----------+------+|
+Phase 6 (Agents)           -----------------------+--+------+|
+Phase 7 (Todo)             -----------------------+--+---+--+|
+Phase 8 (Tools)            --------------------------+---+--+|
+                                                            |
+Phase 9 (Voice Foundation) ---------------------------------+
+Phase 10 (Voice Integration) -------------------------------+
 ```
 
 ---
