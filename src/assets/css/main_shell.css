@@ -89,7 +89,23 @@ ul#main_shell_tabs>li.active {
     color: var(--color_light_black);
     font-weight: bold;
     transform: skewX(35deg) scale(1.2);
-    z-index: -1;
+    z-index: 1;
+    box-shadow:
+        0 0 8px rgba(var(--color_r), var(--color_g), var(--color_b), 0.8),
+        0 0 16px rgba(var(--color_r), var(--color_g), var(--color_b), 0.4);
+    animation: activeGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes activeGlow {
+    0% { opacity: 0.6; }
+    100% { opacity: 0.9; }
+}
+
+ul#main_shell_tabs>li p[contenteditable="true"] {
+    background: rgba(0, 0, 0, 0.5);
+    outline: 1px solid rgb(var(--color_r), var(--color_g), var(--color_b));
+    padding: 2px 4px;
+    min-width: 50px;
 }
 
 div#main_shell_innercontainer,
