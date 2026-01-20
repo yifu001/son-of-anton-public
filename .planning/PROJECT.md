@@ -77,6 +77,8 @@ Real-time visibility and control over Claude Code sessions — knowing what agen
 - **Platform**: Windows primary, cross-platform secondary
 - **Data source**: Claude Code internals (must research parsing approach)
 - **Voice API**: OpenAI Whisper API (requires API key in secrets.json)
+- **Development split**: Node 22 for Claude Code dev, Node 16 for Electron testing (nvm switch)
+- **Testing**: All state parsing requires mock data fallback for Node 16 testing
 
 ## Key Decisions
 

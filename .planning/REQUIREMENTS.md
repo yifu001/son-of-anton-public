@@ -92,39 +92,39 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VOICE-01 | TBD | Pending |
-| VOICE-02 | TBD | Pending |
-| VOICE-03 | TBD | Pending |
-| VOICE-04 | TBD | Pending |
-| VOICE-05 | TBD | Pending |
-| CTX-01 | TBD | Pending |
-| CTX-02 | TBD | Pending |
-| CTX-03 | TBD | Pending |
-| CTX-04 | TBD | Pending |
-| CTX-05 | TBD | Pending |
-| AGENT-01 | TBD | Pending |
-| AGENT-02 | TBD | Pending |
-| AGENT-03 | TBD | Pending |
-| AGENT-04 | TBD | Pending |
-| AGENT-05 | TBD | Pending |
-| TODO-01 | TBD | Pending |
-| TODO-02 | TBD | Pending |
-| TODO-03 | TBD | Pending |
-| TOOL-01 | TBD | Pending |
-| TOOL-02 | TBD | Pending |
-| TOOL-03 | TBD | Pending |
-| TERM-01 | TBD | Pending |
-| TERM-02 | TBD | Pending |
-| TERM-03 | TBD | Pending |
-| FIX-01 | TBD | Pending |
-| FIX-02 | TBD | Pending |
-| FIX-03 | TBD | Pending |
+| VOICE-01 | 9 | Pending |
+| VOICE-02 | 9 | Pending |
+| VOICE-03 | 9 | Pending |
+| VOICE-04 | 10 | Pending |
+| VOICE-05 | 10 | Pending |
+| CTX-01 | 5 | Pending |
+| CTX-02 | 5 | Pending |
+| CTX-03 | 4 | Pending |
+| CTX-04 | 5 | Pending |
+| CTX-05 | 3 | Pending |
+| AGENT-01 | 6 | Pending |
+| AGENT-02 | 6 | Pending |
+| AGENT-03 | 6 | Pending |
+| AGENT-04 | 6 | Pending |
+| AGENT-05 | 3 | Pending |
+| TODO-01 | 7 | Pending |
+| TODO-02 | 7 | Pending |
+| TODO-03 | 7 | Pending |
+| TOOL-01 | 8 | Pending |
+| TOOL-02 | 8 | Pending |
+| TOOL-03 | 8 | Pending |
+| TERM-01 | 2 | Pending |
+| TERM-02 | 2 | Pending |
+| TERM-03 | 2 | Pending |
+| FIX-01 | 1 | Pending |
+| FIX-02 | 1 | Pending |
+| FIX-03 | 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 27 total
-- Mapped to phases: 0
-- Unmapped: 27 (pending roadmap)
+- Mapped to phases: 27
+- Unmapped: 0
 
 ---
 *Requirements defined: 2025-01-20*
-*Last updated: 2025-01-20 after initial definition*
+*Last updated: 2026-01-20 after roadmap creation*
