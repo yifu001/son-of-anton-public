@@ -54,6 +54,11 @@ Plans:
 
 **Dependencies:** None
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 02-01-PLAN.md - Implement terminal tab management (editable names, glow, persistence)
+
 ---
 
 ## Phase 3: UI Layout Restructure
