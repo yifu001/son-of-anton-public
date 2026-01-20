@@ -87,8 +87,27 @@ class Netstat {
                 }
             } else {
                 // Find the first external, IPv4 connected networkInterface that has a MAC address set
-                if (window.settings.debug) console.log("[Netstat] Searching for valid interface...");
-                while (net.operstate !== "up" || net.internal === true || net.ip4 === "" || net.mac === "") {
+                const isWindows = require("os").type() === "Windows_NT";
+                if (window.settings.debug) {
+                    console.log(`[Netstat] Platform: ${require("os").type()}`);
+                    console.log("[Netstat] Searching for valid interface...");
+                }
+
+                // Windows: Accept "unknown" operstate and don't require MAC
+                // Other OS: Keep strict requirements
+                const isValidInterface = (iface) => {
+                    if (iface.internal === true) return false;
+                    if (iface.ip4 === "") return false;
+                    if (isWindows) {
+                        // Windows: operstate is often "unknown" for active interfaces
+                        return iface.operstate === "up" || iface.operstate === "unknown";
+                    } else {
+                        // Linux/Mac: require "up" and MAC address
+                        return iface.operstate === "up" && iface.mac !== "";
+                    }
+                };
+
+                while (!isValidInterface(net)) {
                     if (window.settings.debug) console.log(`[Netstat] Skipping ${net.iface}: operstate=${net.operstate}, internal=${net.internal}, ip4=${net.ip4}, mac=${net.mac}`);
                     netID++;
                     if (data[netID]) {
