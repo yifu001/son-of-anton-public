@@ -116,9 +116,9 @@
 | TERM-01 | 2 | Pending |
 | TERM-02 | 2 | Pending |
 | TERM-03 | 2 | Pending |
-| FIX-01 | 1 | Pending |
-| FIX-02 | 1 | Pending |
-| FIX-03 | 1 | Pending |
+| FIX-01 | 1 | Complete |
+| FIX-02 | 1 | Complete |
+| FIX-03 | 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 27 total

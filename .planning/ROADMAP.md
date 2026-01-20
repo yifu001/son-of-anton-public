@@ -30,8 +30,10 @@ This roadmap delivers a Claude Code command center in 10 phases: starting with q
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md - Fix Windows network interface detection in netstat
-- [ ] 01-02-PLAN.md - Fix globe mock data fallback and Windows CWD tracking
+- [x] 01-01-PLAN.md - Fix Windows network interface detection in netstat
+- [x] 01-02-PLAN.md - Fix globe mock data fallback and Windows CWD tracking
+
+**Status:** Complete (2026-01-20)
 
 ---
 
@@ -215,7 +217,7 @@ Plans:
 
 | Phase | Name | Status | Requirements |
 |-------|------|--------|--------------|
-| 1 | Bug Fixes | Planned | 3 |
+| 1 | Bug Fixes | ✓ Complete | 3 |
 | 2 | Terminal Management | Pending | 3 |
 | 3 | UI Layout Restructure | Pending | 2 |
 | 4 | Claude Code State Infrastructure | Pending | 1 |
