@@ -107,6 +107,31 @@ class Netstat {
                     }
                 };
 
+                // Prioritize interfaces: prefer those with typical private IP ranges
+                const prioritizeInterfaces = (interfaces) => {
+                    return interfaces.slice().sort((a, b) => {
+                        const scoreIface = (iface) => {
+                            if (!iface.ip4) return 0;
+                            // Prefer common private ranges
+                            if (iface.ip4.startsWith("192.168.")) return 100;
+                            if (iface.ip4.startsWith("10.")) return 90;
+                            if (iface.ip4.match(/^172\.(1[6-9]|2[0-9]|3[01])\./)) return 80;
+                            // Valid non-private IP
+                            if (iface.ip4 !== "127.0.0.1") return 50;
+                            return 0;
+                        };
+                        return scoreIface(b) - scoreIface(a);
+                    });
+                };
+
+                // Apply prioritization on Windows (where multiple valid interfaces common)
+                if (isWindows) {
+                    data = prioritizeInterfaces(data);
+                    net = data[0];
+                    netID = 0;
+                    if (window.settings.debug) console.log("[Netstat] Interfaces prioritized by IP range");
+                }
+
                 while (!isValidInterface(net)) {
                     if (window.settings.debug) console.log(`[Netstat] Skipping ${net.iface}: operstate=${net.operstate}, internal=${net.internal}, ip4=${net.ip4}, mac=${net.mac}`);
                     netID++;
