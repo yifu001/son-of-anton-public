@@ -79,6 +79,11 @@ Plans:
 
 **Dependencies:** None
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 03-01-PLAN.md - Restructure right-side widget layout (Context placeholder, AgentList relocation)
+
 ---
 
 ## Phase 4: Claude Code State Infrastructure
