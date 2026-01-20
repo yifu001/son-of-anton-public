@@ -134,9 +134,9 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 05-01-PLAN.md — Implement context usage display with progress bar, token count, and warning state
+- [x] 05-01-PLAN.md — Implement context usage display with progress bar, token count, and warning state
 
-**Status:** Planned
+**Status:** Complete (2026-01-20)
 
 ---
 
@@ -249,7 +249,7 @@ Plans:
 | 2 | Terminal Management | ✓ Complete | 3 |
 | 3 | UI Layout Restructure | ✓ Complete | 2 |
 | 4 | Claude Code State Infrastructure | ✓ Complete | 1 |
-| 5 | Context Tracking Display | Planned | 3 |
+| 5 | Context Tracking Display | ✓ Complete | 3 |
 | 6 | Agent Visibility | Pending | 4 |
 | 7 | Todo Display | Pending | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
