@@ -66,8 +66,9 @@ See: .planning/PROJECT.md
 ### Blockers
 - (none)
 
-### Todos
-- (none)
+### Pending Todos
+- Fix phase 1 bugs - still not working (general)
+- Change app logo to new terminal icon (ui)
 
 ## Phase 1 Completion
 
