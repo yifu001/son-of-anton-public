@@ -317,6 +317,33 @@ class Terminal {
             this.ondisconnected = () => { };
 
             this._disableCWDtracking = false;
+            this._windowsCwdFromPrompt = null;
+            this._lastPromptMatch = 0;
+
+            this._parseWindowsCwdFromOutput = (data) => {
+                // Match Windows prompt patterns
+                // cmd.exe: "C:\path\to\dir>"
+                // PowerShell: "PS C:\path\to\dir>"
+                const patterns = [
+                    /^PS ([A-Z]:\\[^>\r\n]*?)>\s*$/m,       // PowerShell
+                    /^([A-Z]:\\[^>\r\n]*?)>\s*$/m,          // cmd.exe
+                    /PS ([A-Z]:\\[^>\r\n]*?)> /m,           // PowerShell mid-line
+                    /([A-Z]:\\[^>\r\n]*?)> /m,              // cmd.exe mid-line
+                ];
+
+                for (const pattern of patterns) {
+                    const match = data.match(pattern);
+                    if (match && match[1]) {
+                        const cwd = match[1].trim();
+                        // Validate it looks like a real path
+                        if (cwd.length >= 3 && /^[A-Z]:\\/.test(cwd)) {
+                            return cwd;
+                        }
+                    }
+                }
+                return null;
+            };
+
             this._getTtyCWD = tty => {
                 return new Promise((resolve, reject) => {
                     let pid = tty._pid;
@@ -338,6 +365,15 @@ class Terminal {
                                     resolve(cwd.trim());
                                 }
                             });
+                            break;
+                        case "Windows_NT":
+                            // Use CWD parsed from prompt if available
+                            if (this._windowsCwdFromPrompt) {
+                                resolve(this._windowsCwdFromPrompt);
+                            } else {
+                                // Fall back to initial cwd - prompt-based detection will update later
+                                reject(new Error("Waiting for prompt-based CWD detection"));
+                            }
                             break;
                         default:
                             reject("Unsupported OS");
@@ -468,6 +504,19 @@ class Terminal {
                 this.tty.onData(data => {
                     this._nextTickUpdateTtyCWD = true;
                     this._nextTickUpdateProcess = true;
+
+                    // Windows: Parse CWD from prompt output
+                    if (require("os").type() === "Windows_NT") {
+                        const parsed = this._parseWindowsCwdFromOutput(data);
+                        if (parsed && parsed !== this._windowsCwdFromPrompt) {
+                            this._windowsCwdFromPrompt = parsed;
+                            this.tty._cwd = parsed;
+                            if (this.renderer) {
+                                this.renderer.send("terminal_channel-" + this.port, "New cwd", parsed);
+                            }
+                        }
+                    }
+
                     try {
                         ws.send(data);
                     } catch (e) {
