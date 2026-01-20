@@ -47,11 +47,32 @@ const fontsDir = path.join(settingsDir, "fonts");
 const settingsFile = path.join(settingsDir, "settings.json");
 const shortcutsFile = path.join(settingsDir, "shortcuts.json");
 const lastWindowStateFile = path.join(settingsDir, "lastWindowState.json");
+const terminalNamesFile = path.join(settingsDir, "terminalNames.json");
 
 // Load config
 window.settings = require(settingsFile);
 window.shortcuts = require(shortcutsFile);
 window.lastWindowState = require(lastWindowStateFile);
+
+// Load terminal names with fallback to defaults
+try {
+    if (fs.existsSync(terminalNamesFile)) {
+        window.terminalNames = JSON.parse(fs.readFileSync(terminalNamesFile, 'utf-8'));
+    } else {
+        window.terminalNames = { 0: "MAIN SHELL", 1: "EMPTY", 2: "EMPTY", 3: "EMPTY", 4: "EMPTY" };
+    }
+} catch (e) {
+    console.error("Failed to load terminal names:", e);
+    window.terminalNames = { 0: "MAIN SHELL", 1: "EMPTY", 2: "EMPTY", 3: "EMPTY", 4: "EMPTY" };
+}
+
+window.saveTerminalNames = () => {
+    try {
+        fs.writeFileSync(terminalNamesFile, JSON.stringify(window.terminalNames, null, 4));
+    } catch (e) {
+        console.error("Failed to save terminal names:", e);
+    }
+};
 
 // Load CLI parameters
 if (remote.process.argv.includes("--nointro")) {
@@ -466,11 +487,11 @@ async function initUI() {
     let shellContainer = document.getElementById("main_shell");
     shellContainer.innerHTML += `
         <ul id="main_shell_tabs">
-            <li id="shell_tab0" onclick="window.focusShellTab(0);" class="active"><p>MAIN SHELL</p></li>
-            <li id="shell_tab1" onclick="window.focusShellTab(1);"><p>EMPTY</p></li>
-            <li id="shell_tab2" onclick="window.focusShellTab(2);"><p>EMPTY</p></li>
-            <li id="shell_tab3" onclick="window.focusShellTab(3);"><p>EMPTY</p></li>
-            <li id="shell_tab4" onclick="window.focusShellTab(4);"><p>EMPTY</p></li>
+            <li id="shell_tab0" onclick="window.focusShellTab(0);" class="active"><p>${window._escapeHtml(window.terminalNames[0])}</p></li>
+            <li id="shell_tab1" onclick="window.focusShellTab(1);"><p>${window._escapeHtml(window.terminalNames[1])}</p></li>
+            <li id="shell_tab2" onclick="window.focusShellTab(2);"><p>${window._escapeHtml(window.terminalNames[2])}</p></li>
+            <li id="shell_tab3" onclick="window.focusShellTab(3);"><p>${window._escapeHtml(window.terminalNames[3])}</p></li>
+            <li id="shell_tab4" onclick="window.focusShellTab(4);"><p>${window._escapeHtml(window.terminalNames[4])}</p></li>
         </ul>
         <div id="main_shell_innercontainer">
             <pre id="terminal0" class="active"></pre>
@@ -488,7 +509,10 @@ async function initUI() {
     };
     window.currentTerm = 0;
     window.term[0].onprocesschange = p => {
-        document.getElementById("shell_tab0").innerHTML = `<p>MAIN - ${p}</p>`;
+        // Only show process name if user hasn't set a custom name
+        if (window.terminalNames[0] === "MAIN SHELL") {
+            document.getElementById("shell_tab0").querySelector('p').innerHTML = `MAIN - ${p}`;
+        }
     };
     // Prevent losing hardware keyboard focus on the terminal when using touch keyboard
     window.onmouseup = e => {
@@ -643,6 +667,9 @@ window.focusShellTab = number => {
 
                 window.term[number].onclose = e => {
                     delete window.term[number].onprocesschange;
+                    // Reset to default name on close
+                    window.terminalNames[number] = "EMPTY";
+                    window.saveTerminalNames();
                     document.getElementById("shell_tab" + number).innerHTML = "<p>EMPTY</p>";
                     document.getElementById("terminal" + number).innerHTML = "";
                     window.term[number].term.dispose();
@@ -651,7 +678,11 @@ window.focusShellTab = number => {
                 };
 
                 window.term[number].onprocesschange = p => {
-                    document.getElementById("shell_tab" + number).innerHTML = `<p>#${number + 1} - ${p}</p>`;
+                    // Only show process name if user hasn't set a custom name
+                    const defaultName = "EMPTY";
+                    if (window.terminalNames[number] === defaultName || window.terminalNames[number].startsWith('#')) {
+                        document.getElementById("shell_tab" + number).querySelector('p').innerHTML = `#${number + 1} - ${p}`;
+                    }
                 };
 
                 document.getElementById("shell_tab" + number).innerHTML = `<p>::${port}</p>`;
