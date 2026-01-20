@@ -89,7 +89,12 @@ class Netstat {
                 // Find the first external, IPv4 connected networkInterface that has a MAC address set
                 const isWindows = require("os").type() === "Windows_NT";
                 if (window.settings.debug) {
-                    console.log(`[Netstat] Platform: ${require("os").type()}`);
+                    console.log("[Netstat] === Interface Detection Start ===");
+                    console.log("[Netstat] OS:", require("os").type());
+                    console.log("[Netstat] Total interfaces:", data.length);
+                    data.forEach((iface, idx) => {
+                        console.log(`[Netstat] [${idx}] ${iface.iface}: operstate=${iface.operstate}, internal=${iface.internal}, ip4=${iface.ip4}, mac=${iface.mac ? iface.mac.substring(0,8)+'...' : 'none'}`);
+                    });
                     console.log("[Netstat] Searching for valid interface...");
                 }
 
