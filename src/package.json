@@ -25,6 +25,7 @@
   "dependencies": {
     "@electron/remote": "^1.2.2",
     "augmented-ui": "^1.1.2",
+    "chokidar": "^3.5.3",
     "color": "3.2.1",
     "geolite2-redist": "^2.0.4",
     "howler": "2.2.3",
