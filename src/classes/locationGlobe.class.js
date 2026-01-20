@@ -173,6 +173,9 @@ class LocationGlobe {
         if (window.mods.netstat.offline) {
             // Use mock data when offline to keep globe active
             this.updateWithMockData();
+        } else if (!window.mods.netstat.ipinfo || !window.mods.netstat.ipinfo.geo) {
+            // ipinfo not ready yet (async HTTP call still pending), retry in 1 second
+            setTimeout(() => this.updateLoc(), 1000);
         } else {
             this.updateConOnlineConnection().then(() => {
                 document.querySelector("div#mod_globe").setAttribute("class", "");
