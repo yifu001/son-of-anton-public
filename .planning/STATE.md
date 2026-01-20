@@ -2,22 +2,22 @@
 
 **Project:** Son of Anton
 **Current Phase:** 4
-**Status:** Ready to plan
+**Status:** Phase complete
 
 ## Project Reference
 
 See: .planning/PROJECT.md
 **Core value:** Real-time visibility and control over Claude Code sessions
-**Current focus:** Phase 4 - Claude Code State Infrastructure
+**Current focus:** Phase 5 - Context Tracking Display
 
 ## Progress
 
 | Phase | Name | Status | Requirements |
 |-------|------|--------|--------------|
-| 1 | Bug Fixes | ✓ Complete | 3 |
-| 2 | Terminal Management | ✓ Complete | 3 |
-| 3 | UI Layout Restructure | ✓ Complete | 2 |
-| 4 | Claude Code State Infrastructure | Pending | 1 |
+| 1 | Bug Fixes | Complete | 3 |
+| 2 | Terminal Management | Complete | 3 |
+| 3 | UI Layout Restructure | Complete | 2 |
+| 4 | Claude Code State Infrastructure | Complete | 1 |
 | 5 | Context Tracking Display | Pending | 3 |
 | 6 | Agent Visibility | Pending | 4 |
 | 7 | Todo Display | Pending | 3 |
@@ -25,21 +25,21 @@ See: .planning/PROJECT.md
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Progress:** [███.......] 3/10 phases complete
+**Progress:** [████......] 4/10 phases complete
 
 ## Current Position
 
 - **Phase:** 4 - Claude Code State Infrastructure
-- **Plan:** Not yet created
-- **Status:** Ready to plan
+- **Plan:** 1/1 complete
+- **Status:** Phase complete
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Phases completed | 3 |
-| Requirements delivered | 8/27 |
-| Plans executed | 5 |
+| Phases completed | 4 |
+| Requirements delivered | 9/27 |
+| Plans executed | 6 |
 
 ## Accumulated Context
 
@@ -55,6 +55,11 @@ See: .planning/PROJECT.md
 - Context widget: Placeholder display (-- / --) ready for Phase 5 data binding
 - AgentList offset: translateX(5px) instead of margin for layout stability
 - ClaudeUsage: Commented out rather than deleted for reference
+- chokidar 3.5.3: Selected for Node 16/Electron 12 compatibility
+- awaitWriteFinish 500ms: Windows writes files slowly; stability threshold prevents partial reads
+- IPC debounce 100ms: Prevents renderer overload during rapid Claude updates
+- Path normalization: Backslash to forward slash, lowercase for cross-platform comparison
+- Terminal-session mapping: Longest-prefix match for CWD to project path
 
 ### Technical Notes
 - Node 16.x required (Electron 12 ABI compatibility)
@@ -67,6 +72,10 @@ See: .planning/PROJECT.md
 - Active tab glow: box-shadow with CSS keyframes animation for voice input indicator
 - Right-column widget pattern: border-top, ::before/::after corner accents, flex display
 - Widget instantiation order: netstat -> globe -> conninfo -> context -> agentList
+- ClaudeStateManager watches ~/.claude.json and ~/.claude/todos/
+- IPC channel: claude-state-update broadcasts state to renderer
+- Renderer globals: window.claudeState, window.terminalSessions
+- Custom event: claude-state-changed for widget subscription
 
 ### Blockers
 - (none)
@@ -114,10 +123,23 @@ See: .planning/PROJECT.md
 **Verification:** Passed (5/5 must-haves)
 **Report:** .planning/phases/03-ui-layout-restructure/03-VERIFICATION.md
 
+## Phase 4 Completion
+
+**Completed:** 2026-01-20
+**Plans:** 1/1
+**Commits:**
+- `8bdf7e3` feat(04-01): create ClaudeStateManager class
+- `bb438ed` feat(04-01): integrate ClaudeStateManager into _boot.js
+- `e706db3` feat(04-01): add IPC listener for Claude state in _renderer.js
+
+**Summary:** .planning/phases/04-claude-code-state-infrastructure/04-01-SUMMARY.md
+
 ## Session Continuity
 
-**Last session:** Phase 3 execution complete
-**Next action:** `/gsd:plan-phase 4` or `/gsd:discuss-phase 4`
+**Last session:** 2026-01-20T23:25:11Z
+**Stopped at:** Completed 04-01-PLAN.md
+**Resume file:** None
+**Next action:** `/gsd:plan-phase 5` or `/gsd:discuss-phase 5`
 
 ---
 *State initialized: 2026-01-20*
