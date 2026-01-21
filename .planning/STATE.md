@@ -99,7 +99,7 @@ See: .planning/PROJECT.md
 - Renderer globals: window.claudeState, window.terminalSessions
 - Custom event: claude-state-changed for widget subscription
 - Widget state subscription: addEventListener('claude-state-changed', handler)
-- Session lookup: window.terminalSessions[currentTerm] for active session ID
+- Session lookup: Prefer liveContext.session_id over lastSessionId for current terminal
 - Icon regeneration: node scripts/generate-icons.js from media/logo.png
 - ClaudeStateManager.state.agents: Array of {id, slug, task, status, mtime, sessionId}
 - Agent status values: PENDING, RUNNING, COMPLETE, FAILED

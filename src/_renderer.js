@@ -153,7 +153,7 @@ ipc.on('claude-state-update', (event, state) => {
     // Map each active terminal to a Claude session based on CWD
     for (let i = 0; i < 5; i++) {
         if (window.term && window.term[i] && window.term[i].cwd) {
-            const sessionId = findSessionForCwd(window.term[i].cwd, state.projects);
+            const sessionId = findSessionForCwd(window.term[i].cwd, state.projects, state.liveContext);
             if (sessionId) {
                 window.terminalSessions[i] = sessionId;
             } else {
@@ -167,10 +167,22 @@ ipc.on('claude-state-update', (event, state) => {
 });
 
 // Helper: Find Claude session ID for a given CWD
-function findSessionForCwd(cwd, projects) {
-    if (!cwd || !projects) return null;
+function findSessionForCwd(cwd, projects, liveContext) {
+    if (!cwd) return null;
 
     const normalizedCwd = cwd.replace(/\\/g, '/').toLowerCase();
+
+    // Prefer liveContext.session_id if CWD matches liveContext.project_dir
+    if (liveContext && liveContext.session_id && liveContext.project_dir) {
+        const normalizedLiveDir = liveContext.project_dir.replace(/\\/g, '/').toLowerCase();
+        if (normalizedCwd.startsWith(normalizedLiveDir)) {
+            return liveContext.session_id;
+        }
+    }
+
+    // Fallback to lastSessionId from projects
+    if (!projects) return null;
+
     let bestMatch = null;
     let bestMatchLen = 0;
 
