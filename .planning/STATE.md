@@ -2,7 +2,7 @@
 
 **Project:** Son of Anton
 **Current Phase:** 8.1
-**Status:** Planning
+**Status:** Complete
 
 ## Project Reference
 
@@ -23,25 +23,25 @@ See: .planning/PROJECT.md
 | 6 | Agent Visibility | Complete (2/2 plans) | 4 |
 | 7 | Todo Display | Complete (1/1 plans) | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
-| 8.1 | Silent Failures Fix | Planning | 3 |
+| 8.1 | Silent Failures Fix | Complete (1/1 plans) | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Progress:** [████████..] 8/12 phases complete
+**Progress:** [█████████.] 9/12 phases complete
 
 ## Current Position
 
 - **Phase:** 8.1 - Silent Failures Fix
-- **Plan:** 0 of 1 complete
-- **Status:** Planning
+- **Plan:** 1 of 1 complete
+- **Status:** Complete
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Phases completed | 8 |
-| Requirements delivered | 21/27 |
-| Plans executed | 14 |
+| Phases completed | 9 |
+| Requirements delivered | 24/27 |
+| Plans executed | 15 |
 
 ## Accumulated Context
 
@@ -83,6 +83,9 @@ See: .planning/PROJECT.md
 - Todo content fallback: content || description || title || 'Task'
 - TodoWidget spinner: 1s linear infinite rotation
 - TodoWidget position: 4th in right column (after conninfo)
+- Main process logging: Unconditional console.warn with [ClaudeState] prefix
+- Renderer logging: Debug-gated console.warn/error with [Renderer] prefix
+- IPC timeout: 30 seconds for systeminformation proxy
 
 ### Technical Notes
 - Node 16.x required (Electron 12 ABI compatibility)
@@ -239,10 +242,24 @@ See: .planning/PROJECT.md
 **Verification:** Passed (7/7 must-haves)
 **Report:** .planning/phases/07-todo-display/07-VERIFICATION.md
 
+## Phase 8.1 Completion
+
+**Completed:** 2026-01-21
+**Plans:** 1/1
+
+### Plan 01: Silent Failures Fix
+**Completed:** 2026-01-21
+**Commits:**
+- `d854cd0` fix(08.1-01): add debug logging to ClaudeStateManager catch blocks
+- `4f28445` fix(08.1-01): add IPC timeout and username fetch logging
+- `a24e035` fix(08.1-01): add file write error handling in _renderer.js
+
+**Summary:** .planning/phases/08.1-silent-failures-fix/08.1-01-SUMMARY.md
+
 ## Session Continuity
 
-**Last session:** 2026-01-21 - Started Phase 8.1 (Silent Failures Fix)
-**Next action:** Plan Phase 8.1
+**Last session:** 2026-01-21 - Completed Phase 8.1 (Silent Failures Fix)
+**Next action:** Continue with Phase 8 (Tools/MCP Display) or Phase 9 (Voice Foundation)
 
 ---
 *State initialized: 2026-01-20*
