@@ -301,13 +301,28 @@ function initSystemInformationProxy() {
 
                 return new Promise((resolve, reject) => {
                     let id = nanoid();
-                    ipc.once("systeminformation-reply-" + id, (e, res) => {
+                    let timeoutId = null;
+
+                    const handler = (e, res) => {
+                        clearTimeout(timeoutId);
                         if (callback) {
                             args[args.length - 1](res);
                         }
                         resolve(res);
-                    });
+                    };
+
+                    ipc.once("systeminformation-reply-" + id, handler);
                     ipc.send("systeminformation-call", prop, id, ...args);
+
+                    // 30 second timeout to prevent indefinite hangs
+                    timeoutId = setTimeout(() => {
+                        ipc.removeListener("systeminformation-reply-" + id, handler);
+                        const error = new Error(`IPC timeout: systeminformation.${prop}() did not respond within 30s`);
+                        if (window.settings && window.settings.debug) {
+                            console.error("[Renderer] " + error.message);
+                        }
+                        reject(error);
+                    }, 30000);
                 });
             };
         }
@@ -449,7 +464,11 @@ async function getDisplayName() {
 
     try {
         user = await require("username")();
-    } catch (e) { }
+    } catch (e) {
+        if (window.settings && window.settings.debug) {
+            console.warn("[Renderer] Username fetch failed:", e.message);
+        }
+    }
 
     return user;
 }
@@ -552,7 +571,6 @@ async function initUI() {
     window.mods.todoWidget = new TodoWidget("mod_column_right");
     // window.mods.context = new ContextWidget("mod_column_right");  // Disabled - using Claude HUD instead
     window.mods.agentList = new AgentList("mod_column_left");
-    // window.mods.claudeUsage = new ClaudeUsage("mod_column_right");  // Disabled - replaced by Context
 
     // Fade-in animations
     document.querySelectorAll(".mod_column").forEach(e => {
