@@ -110,7 +110,7 @@ See: .planning/PROJECT.md
 - (none)
 
 ### Pending Todos
-(none)
+- Fix silent failures and improve error handling (2 critical, 5 high, 7 medium)
 
 ## Phase 1 Completion
 
