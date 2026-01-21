@@ -1,8 +1,8 @@
 # Roadmap: Son of Anton
 
 **Created:** 2026-01-20
-**Phases:** 10
-**Requirements:** 27 mapped
+**Phases:** 11
+**Requirements:** 29 mapped
 **Depth:** comprehensive
 
 ## Overview
@@ -140,6 +140,25 @@ Plans:
 
 ---
 
+## Phase 5.1: Quick Fixes & Branding
+
+**Goal:** Address remaining Phase 1 issues and update app branding.
+
+**Requirements:**
+- FIX-04: Investigate and fix remaining Phase 1 bugs (network/CWD/globe issues)
+- BRAND-01: Update app logo to new sci-fi terminal icon
+
+**Success Criteria:**
+1. All Phase 1 bug fixes verified working (network interface detection, CWD tracking, globe display)
+2. App logo updated in all formats (logo.png, icon.ico, icon.icns)
+3. Electron packaging references updated for new icons
+
+**Dependencies:** None
+
+**Source:** Captured from pending todos (2026-01-20)
+
+---
+
 ## Phase 6: Agent Visibility
 
 **Goal:** Users see what each Claude agent is doing and its current status.
@@ -250,13 +269,14 @@ Plans:
 | 3 | UI Layout Restructure | ✓ Complete | 2 |
 | 4 | Claude Code State Infrastructure | ✓ Complete | 1 |
 | 5 | Context Tracking Display | ✓ Complete | 3 |
+| 5.1 | Quick Fixes & Branding | Pending | 2 |
 | 6 | Agent Visibility | Pending | 4 |
 | 7 | Todo Display | Pending | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Total:** 27 requirements across 10 phases
+**Total:** 29 requirements across 11 phases
 
 ---
 

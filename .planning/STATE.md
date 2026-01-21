@@ -1,14 +1,14 @@
 # Project State
 
 **Project:** Son of Anton
-**Current Phase:** 6
+**Current Phase:** 5.1
 **Status:** Ready to plan
 
 ## Project Reference
 
 See: .planning/PROJECT.md
 **Core value:** Real-time visibility and control over Claude Code sessions
-**Current focus:** Phase 6 - Agent Visibility (up next)
+**Current focus:** Phase 5.1 - Quick Fixes & Branding (up next)
 
 ## Progress
 
@@ -19,17 +19,18 @@ See: .planning/PROJECT.md
 | 3 | UI Layout Restructure | Complete | 2 |
 | 4 | Claude Code State Infrastructure | Complete | 1 |
 | 5 | Context Tracking Display | ✓ Complete | 3 |
+| 5.1 | Quick Fixes & Branding | Pending | 2 |
 | 6 | Agent Visibility | Pending | 4 |
 | 7 | Todo Display | Pending | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Progress:** [█████.....] 5/10 phases complete
+**Progress:** [█████.....] 5/11 phases complete
 
 ## Current Position
 
-- **Phase:** 6 - Agent Visibility
+- **Phase:** 5.1 - Quick Fixes & Branding
 - **Plan:** Not yet created
 - **Status:** Ready to plan
 
@@ -87,8 +88,7 @@ See: .planning/PROJECT.md
 - (none)
 
 ### Pending Todos
-- Fix phase 1 bugs - still not working (general)
-- Change app logo to new terminal icon (ui)
+(none - converted to Phase 5.1)
 
 ## Phase 1 Completion
 
@@ -157,8 +157,8 @@ See: .planning/PROJECT.md
 
 ## Session Continuity
 
-**Last session:** Phase 5 execution complete
-**Next action:** `/gsd:discuss-phase 6` or `/gsd:plan-phase 6`
+**Last session:** Added Phase 5.1 from pending todos
+**Next action:** `/gsd:discuss-phase 5.1` or `/gsd:plan-phase 5.1`
 
 ---
 *State initialized: 2026-01-20*
