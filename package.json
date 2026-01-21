@@ -110,5 +110,8 @@
   },
   "optionalDependencies": {
     "cson-parser": "4.0.9"
+  },
+  "devDependencies": {
+    "png2icons": "^2.0.1"
   }
 }
