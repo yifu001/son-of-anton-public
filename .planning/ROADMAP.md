@@ -158,8 +158,10 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 05.1-01-PLAN.md — Debug and fix network/globe/CWD issues on Windows
-- [ ] 05.1-02-PLAN.md — Generate and deploy new app icons
+- [x] 05.1-01-PLAN.md — Debug and fix network/globe/CWD issues on Windows
+- [x] 05.1-02-PLAN.md — Generate and deploy new app icons
+
+**Status:** Complete (2026-01-20)
 
 **Source:** Captured from pending todos (2026-01-20)
 
@@ -275,7 +277,7 @@ Plans:
 | 3 | UI Layout Restructure | ✓ Complete | 2 |
 | 4 | Claude Code State Infrastructure | ✓ Complete | 1 |
 | 5 | Context Tracking Display | ✓ Complete | 3 |
-| 5.1 | Quick Fixes & Branding | Pending | 2 |
+| 5.1 | Quick Fixes & Branding | ✓ Complete | 2 |
 | 6 | Agent Visibility | Pending | 4 |
 | 7 | Todo Display | Pending | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
