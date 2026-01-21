@@ -537,8 +537,9 @@ async function initUI() {
     window.mods.netstat = new Netstat("mod_column_right");
     window.mods.globe = new LocationGlobe("mod_column_right");
     window.mods.conninfo = new Conninfo("mod_column_right");
-    window.mods.context = new ContextWidget("mod_column_right");  // NEW - replaces ClaudeUsage
-    window.mods.agentList = new AgentList("mod_column_right");    // MOVED from mod_column_left
+    window.mods.todoWidget = new TodoWidget("mod_column_right");
+    // window.mods.context = new ContextWidget("mod_column_right");  // Disabled - using Claude HUD instead
+    window.mods.agentList = new AgentList("mod_column_left");
     // window.mods.claudeUsage = new ClaudeUsage("mod_column_right");  // Disabled - replaced by Context
 
     // Fade-in animations
