@@ -36,12 +36,12 @@ class AgentList {
     }
 
     _processAgents(agents) {
-        // Filter: only show agents from last 24 hours that aren't OFFLINE
-        const cutoff = Date.now() - (24 * 60 * 60 * 1000);
-        const filtered = agents.filter(a => a.mtime > cutoff && a.status !== 'OFFLINE');
+        // Filter: only show truly active agents (RUNNING or PENDING)
+        const activeStatuses = new Set(['RUNNING', 'PENDING']);
+        const filtered = agents.filter(a => activeStatuses.has(a.status));
 
-        // Sort by status priority (RUNNING first, then PENDING, then others) then by mtime
-        const statusPriority = { 'RUNNING': 0, 'PENDING': 1, 'COMPLETE': 2, 'FAILED': 3 };
+        // Sort by status priority (RUNNING first, then PENDING) then by mtime
+        const statusPriority = { 'RUNNING': 0, 'PENDING': 1 };
         filtered.sort((a, b) => {
             const priorityDiff = (statusPriority[a.status] || 99) - (statusPriority[b.status] || 99);
             if (priorityDiff !== 0) return priorityDiff;
