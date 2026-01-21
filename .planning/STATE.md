@@ -1,14 +1,14 @@
 # Project State
 
 **Project:** Son of Anton
-**Current Phase:** 6
-**Status:** In Progress
+**Current Phase:** 7
+**Status:** Ready
 
 ## Project Reference
 
 See: .planning/PROJECT.md
 **Core value:** Real-time visibility and control over Claude Code sessions
-**Current focus:** Phase 6 - Agent Visibility (plan 01 of 2 complete)
+**Current focus:** Phase 7 - Todo Display (next phase)
 
 ## Progress
 
@@ -20,27 +20,27 @@ See: .planning/PROJECT.md
 | 4 | Claude Code State Infrastructure | Complete | 1 |
 | 5 | Context Tracking Display | Complete | 3 |
 | 5.1 | Quick Fixes & Branding | Complete (2/2 plans) | 2 |
-| 6 | Agent Visibility | In Progress (1/2 plans) | 4 |
+| 6 | Agent Visibility | Complete (2/2 plans) | 4 |
 | 7 | Todo Display | Pending | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Progress:** [██████....] 6/11 phases complete
+**Progress:** [███████...] 7/11 phases complete
 
 ## Current Position
 
-- **Phase:** 6 - Agent Visibility
-- **Plan:** 01 of 2 complete
-- **Status:** In progress, next: 06-02 (AgentList Widget Refactor)
+- **Phase:** 7 - Todo Display
+- **Plan:** 0 of ? complete
+- **Status:** Ready for planning
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Phases completed | 6 |
-| Requirements delivered | 14/27 |
-| Plans executed | 10 |
+| Phases completed | 7 |
+| Requirements delivered | 18/27 |
+| Plans executed | 12 |
 
 ## Accumulated Context
 
@@ -75,6 +75,9 @@ See: .planning/PROJECT.md
 - Todo status priority: in_progress->RUNNING, all completed->COMPLETE, any pending->PENDING
 - mtime fallback: <10s = RUNNING, <30min = PENDING, else COMPLETE
 - 5-second subagent polling: Reliable fallback when chokidar glob watching fails
+- Agent naming: Prefer slug title-case, fallback to task word extraction (max 30 chars)
+- AgentList status priority: RUNNING=0, PENDING=1, COMPLETE=2, FAILED=3
+- Agent pulse animation: 1.5s ease-in-out infinite for running status
 
 ### Technical Notes
 - Node 16.x required (Electron 12 ABI compatibility)
@@ -96,6 +99,7 @@ See: .planning/PROJECT.md
 - Icon regeneration: node scripts/generate-icons.js from media/logo.png
 - ClaudeStateManager.state.agents: Array of {id, slug, task, status, mtime, sessionId}
 - Agent status values: PENDING, RUNNING, COMPLETE, FAILED
+- AgentList widget: Event-driven via claude-state-changed, two-line layout with expand
 
 ### Blockers
 - (none)
@@ -190,7 +194,10 @@ See: .planning/PROJECT.md
 
 **Summary:** .planning/phases/05.1-quick-fixes-branding/05.1-02-SUMMARY.md
 
-## Phase 6 Progress
+## Phase 6 Completion
+
+**Completed:** 2026-01-21
+**Plans:** 2/2
 
 ### Plan 01: Agent State Scanning
 **Completed:** 2026-01-21
@@ -200,10 +207,18 @@ See: .planning/PROJECT.md
 
 **Summary:** .planning/phases/06-agent-visibility/06-01-SUMMARY.md
 
+### Plan 02: AgentList Widget Refactor
+**Completed:** 2026-01-21
+**Commits:**
+- `c9930fd` feat(06-02): refactor AgentList to use IPC events with two-line layout
+- `3a9f780` style(06-02): add status colors and pulsing animation for agent list
+
+**Summary:** .planning/phases/06-agent-visibility/06-02-SUMMARY.md
+
 ## Session Continuity
 
-**Last session:** 2026-01-21 - Completed 06-01-PLAN.md (Agent State Scanning)
-**Next action:** Execute 06-02-PLAN.md (AgentList Widget Refactor)
+**Last session:** 2026-01-21 - Completed 06-02-PLAN.md (AgentList Widget Refactor)
+**Next action:** Plan Phase 7 (Todo Display)
 
 ---
 *State initialized: 2026-01-20*
