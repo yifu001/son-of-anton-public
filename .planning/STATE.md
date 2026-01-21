@@ -1,14 +1,14 @@
 # Project State
 
 **Project:** Son of Anton
-**Current Phase:** 5.1
-**Status:** Complete
+**Current Phase:** 6
+**Status:** In Progress
 
 ## Project Reference
 
 See: .planning/PROJECT.md
 **Core value:** Real-time visibility and control over Claude Code sessions
-**Current focus:** Phase 5.1 - Quick Fixes & Branding (complete, ready for Phase 6)
+**Current focus:** Phase 6 - Agent Visibility (plan 01 of 2 complete)
 
 ## Progress
 
@@ -20,7 +20,7 @@ See: .planning/PROJECT.md
 | 4 | Claude Code State Infrastructure | Complete | 1 |
 | 5 | Context Tracking Display | Complete | 3 |
 | 5.1 | Quick Fixes & Branding | Complete (2/2 plans) | 2 |
-| 6 | Agent Visibility | Pending | 4 |
+| 6 | Agent Visibility | In Progress (1/2 plans) | 4 |
 | 7 | Todo Display | Pending | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
 | 9 | Voice Foundation | Pending | 3 |
@@ -30,9 +30,9 @@ See: .planning/PROJECT.md
 
 ## Current Position
 
-- **Phase:** 5.1 - Quick Fixes & Branding
-- **Plan:** 02 of 2 complete
-- **Status:** Phase 5.1 complete, ready for Phase 6
+- **Phase:** 6 - Agent Visibility
+- **Plan:** 01 of 2 complete
+- **Status:** In progress, next: 06-02 (AgentList Widget Refactor)
 
 ## Performance Metrics
 
@@ -40,7 +40,7 @@ See: .planning/PROJECT.md
 |--------|-------|
 | Phases completed | 6 |
 | Requirements delivered | 14/27 |
-| Plans executed | 9 |
+| Plans executed | 10 |
 
 ## Accumulated Context
 
@@ -69,6 +69,12 @@ See: .planning/PROJECT.md
 - Debug logging: Use `[ModuleName]` prefix pattern, gated by window.settings.debug
 - Icon generation: png2icons for ICO/ICNS, jimp for PNG resize (Node 16 compatible)
 - BMP mode for ICO: better Windows executable compatibility
+- Subagent paths: Watch ~/.claude/projects/*/subagents/ AND /*/*/subagents/ for session-scoped
+- 24-hour agent cutoff: Filter out agents older than 24h to prevent memory growth
+- 20 agent limit: Sort by mtime, take top 20 most recent
+- Todo status priority: in_progress->RUNNING, all completed->COMPLETE, any pending->PENDING
+- mtime fallback: <10s = RUNNING, <30min = PENDING, else COMPLETE
+- 5-second subagent polling: Reliable fallback when chokidar glob watching fails
 
 ### Technical Notes
 - Node 16.x required (Electron 12 ABI compatibility)
@@ -88,6 +94,8 @@ See: .planning/PROJECT.md
 - Widget state subscription: addEventListener('claude-state-changed', handler)
 - Session lookup: window.terminalSessions[currentTerm] for active session ID
 - Icon regeneration: node scripts/generate-icons.js from media/logo.png
+- ClaudeStateManager.state.agents: Array of {id, slug, task, status, mtime, sessionId}
+- Agent status values: PENDING, RUNNING, COMPLETE, FAILED
 
 ### Blockers
 - (none)
@@ -182,10 +190,20 @@ See: .planning/PROJECT.md
 
 **Summary:** .planning/phases/05.1-quick-fixes-branding/05.1-02-SUMMARY.md
 
+## Phase 6 Progress
+
+### Plan 01: Agent State Scanning
+**Completed:** 2026-01-21
+**Commits:**
+- `2d25ffd` feat(06-01): add subagent directory watching to ClaudeStateManager
+- `61bbd00` feat(06-01): add 5-second polling fallback for subagent scanning
+
+**Summary:** .planning/phases/06-agent-visibility/06-01-SUMMARY.md
+
 ## Session Continuity
 
-**Last session:** 2026-01-21 - Completed 05.1-02-PLAN.md (App Branding)
-**Next action:** Verify Phase 5.1 or proceed to Phase 6 (Agent Visibility)
+**Last session:** 2026-01-21 - Completed 06-01-PLAN.md (Agent State Scanning)
+**Next action:** Execute 06-02-PLAN.md (AgentList Widget Refactor)
 
 ---
 *State initialized: 2026-01-20*
