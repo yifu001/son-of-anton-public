@@ -30,6 +30,7 @@ class ClaudeStateManager {
         this.projectsDir = path.join(this.claudeDir, 'projects');
         this._updateTimeout = null;
         this._pollInterval = null;
+        this._subagentPollInterval = null;
         this._lastLiveContextMtime = 0;
     }
 
@@ -97,6 +98,9 @@ class ClaudeStateManager {
 
         // Initial scan of subagents
         this._scanAllAgents();
+
+        // Polling fallback for subagents (chokidar glob watching unreliable on Windows/OneDrive)
+        this._subagentPollInterval = setInterval(() => this._pollSubagents(), 5000);
     }
 
     /**
@@ -121,6 +125,13 @@ class ClaudeStateManager {
     }
 
     /**
+     * Poll subagent directories for changes (fallback for unreliable chokidar glob watching)
+     */
+    _pollSubagents() {
+        this._scanAllAgents();
+    }
+
+    /**
      * Stop all file watchers and clean up
      */
     stop() {
@@ -131,6 +142,10 @@ class ClaudeStateManager {
         if (this._pollInterval) {
             clearInterval(this._pollInterval);
             this._pollInterval = null;
+        }
+        if (this._subagentPollInterval) {
+            clearInterval(this._subagentPollInterval);
+            this._subagentPollInterval = null;
         }
         this.watchers.forEach(watcher => watcher.close());
         this.watchers = [];
