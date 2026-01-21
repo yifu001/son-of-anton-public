@@ -204,7 +204,8 @@ class Netstat {
                             }
                         });
                     }).on("error", e => {
-                        // Drop it
+                        // HTTP request failed - log for debugging
+                        if (window.settings.debug) console.log("[Netstat] HTTP error fetching external IP:", e.message);
                     });
                 } else if (this.runsBeforeGeoIPUpdate !== 0) {
                     this.runsBeforeGeoIPUpdate = this.runsBeforeGeoIPUpdate - 1;
