@@ -217,9 +217,9 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 07-01-PLAN.md — Create TodoWidget with status icons and collapsible completed section
+- [x] 07-01-PLAN.md — Create TodoWidget with status icons and collapsible completed section
 
-**Status:** Planned
+**Status:** Complete (2026-01-21)
 
 ---
 
@@ -294,7 +294,7 @@ Plans:
 | 5 | Context Tracking Display | ✓ Complete | 3 |
 | 5.1 | Quick Fixes & Branding | ✓ Complete | 2 |
 | 6 | Agent Visibility | ✓ Complete | 4 |
-| 7 | Todo Display | Planned | 3 |
+| 7 | Todo Display | ✓ Complete | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |

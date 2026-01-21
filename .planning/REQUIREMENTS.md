@@ -31,9 +31,9 @@
 
 ### Todo Display
 
-- [ ] **TODO-01**: Todo list widget shows tasks from Claude Code internals
-- [ ] **TODO-02**: Todo status displayed: running, pending, completed
-- [ ] **TODO-03**: Todo list positioned below context widget on right side
+- [x] **TODO-01**: Todo list widget shows tasks from Claude Code internals
+- [x] **TODO-02**: Todo status displayed: running, pending, completed
+- [x] **TODO-03**: Todo list positioned below context widget on right side
 
 ### Tools/MCP Display
 
@@ -107,9 +107,9 @@
 | AGENT-03 | 6 | Complete |
 | AGENT-04 | 6 | Complete |
 | AGENT-05 | 3 | Complete |
-| TODO-01 | 7 | Pending |
-| TODO-02 | 7 | Pending |
-| TODO-03 | 7 | Pending |
+| TODO-01 | 7 | Complete |
+| TODO-02 | 7 | Complete |
+| TODO-03 | 7 | Complete |
 | TOOL-01 | 8 | Pending |
 | TOOL-02 | 8 | Pending |
 | TOOL-03 | 8 | Pending |
