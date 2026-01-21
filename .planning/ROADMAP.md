@@ -243,6 +243,35 @@ Plans:
 
 ---
 
+## Phase 8.1: Silent Failures Fix
+
+**Goal:** Eliminate silent error suppression patterns that make debugging impossible.
+
+**Requirements:**
+- ERR-01: All empty catch blocks log errors with context
+- ERR-02: IPC Promise has timeout to prevent indefinite hangs
+- ERR-03: File write operations handle and surface errors properly
+
+**Success Criteria:**
+1. All 14 identified silent failure patterns have error logging
+2. IPC Promise rejects after 30s timeout with meaningful error
+3. fs.writeFile callbacks check error parameter and surface failures
+4. Error logging gated by debug flag (window.settings.debug)
+5. No "success" messages shown when operations actually failed
+
+**Dependencies:** None (cross-cutting fix)
+
+**Plans:** 1 plan
+
+Plans:
+- [ ] 08.1-01-PLAN.md — Fix all silent failure patterns in claudeState.class.js and _renderer.js
+
+**Status:** Pending
+
+**Source:** Captured from pending todo (2026-01-21)
+
+---
+
 ## Phase 9: Voice Foundation
 
 **Goal:** Wake word detection and speech-to-text pipeline operational.
@@ -296,10 +325,11 @@ Plans:
 | 6 | Agent Visibility | ✓ Complete | 4 |
 | 7 | Todo Display | ✓ Complete | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
+| 8.1 | Silent Failures Fix | Pending | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Total:** 29 requirements across 11 phases
+**Total:** 32 requirements across 12 phases
 
 ---
 

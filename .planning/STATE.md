@@ -1,14 +1,14 @@
 # Project State
 
 **Project:** Son of Anton
-**Current Phase:** 8
-**Status:** Ready
+**Current Phase:** 8.1
+**Status:** Planning
 
 ## Project Reference
 
 See: .planning/PROJECT.md
 **Core value:** Real-time visibility and control over Claude Code sessions
-**Current focus:** Phase 8 - Tools/MCP Display (next phase)
+**Current focus:** Phase 8.1 - Silent Failures Fix
 
 ## Progress
 
@@ -23,16 +23,17 @@ See: .planning/PROJECT.md
 | 6 | Agent Visibility | Complete (2/2 plans) | 4 |
 | 7 | Todo Display | Complete (1/1 plans) | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
+| 8.1 | Silent Failures Fix | Planning | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Progress:** [████████..] 8/11 phases complete
+**Progress:** [████████..] 8/12 phases complete
 
 ## Current Position
 
-- **Phase:** 8 - Tools/MCP Display
-- **Plan:** 0 of ? complete
-- **Status:** Ready for planning
+- **Phase:** 8.1 - Silent Failures Fix
+- **Plan:** 0 of 1 complete
+- **Status:** Planning
 
 ## Performance Metrics
 
@@ -110,7 +111,7 @@ See: .planning/PROJECT.md
 - (none)
 
 ### Pending Todos
-- Fix silent failures and improve error handling (2 critical, 5 high, 7 medium)
+- (none)
 
 ## Phase 1 Completion
 
@@ -240,8 +241,8 @@ See: .planning/PROJECT.md
 
 ## Session Continuity
 
-**Last session:** 2026-01-21 - Completed Phase 7 (Todo Display)
-**Next action:** Plan Phase 8 (Tools/MCP Display)
+**Last session:** 2026-01-21 - Started Phase 8.1 (Silent Failures Fix)
+**Next action:** Plan Phase 8.1
 
 ---
 *State initialized: 2026-01-20*
