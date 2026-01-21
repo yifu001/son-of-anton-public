@@ -214,6 +214,13 @@ Plans:
 
 **Dependencies:** Phase 4 (state infrastructure), Phase 5 (establishes right sidebar order)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 07-01-PLAN.md — Create TodoWidget with status icons and collapsible completed section
+
+**Status:** Planned
+
 ---
 
 ## Phase 8: Tools/MCP Display
@@ -287,7 +294,7 @@ Plans:
 | 5 | Context Tracking Display | ✓ Complete | 3 |
 | 5.1 | Quick Fixes & Branding | ✓ Complete | 2 |
 | 6 | Agent Visibility | ✓ Complete | 4 |
-| 7 | Todo Display | Pending | 3 |
+| 7 | Todo Display | Planned | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
