@@ -264,9 +264,9 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 08.1-01-PLAN.md — Fix all silent failure patterns in claudeState.class.js and _renderer.js
+- [x] 08.1-01-PLAN.md — Fix all silent failure patterns in claudeState.class.js and _renderer.js
 
-**Status:** Pending
+**Status:** Complete (2026-01-21)
 
 **Source:** Captured from pending todo (2026-01-21)
 
@@ -325,7 +325,7 @@ Plans:
 | 6 | Agent Visibility | ✓ Complete | 4 |
 | 7 | Todo Display | ✓ Complete | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
-| 8.1 | Silent Failures Fix | Pending | 3 |
+| 8.1 | Silent Failures Fix | ✓ Complete | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
