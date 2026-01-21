@@ -170,12 +170,23 @@ class LocationGlobe {
         return (Math.random() * (to - from) + from).toFixed(fixed) * 1;
     }
     updateLoc() {
+        if (window.settings.debug) {
+            console.log("[Globe] updateLoc: offline=", window.mods.netstat.offline);
+            console.log("[Globe] updateLoc: ipinfo=", window.mods.netstat.ipinfo);
+        }
+
         if (window.mods.netstat.offline) {
             // Use mock data when offline to keep globe active
             this.updateWithMockData();
-        } else if (!window.mods.netstat.ipinfo || !window.mods.netstat.ipinfo.geo) {
+        } else if (!window.mods.netstat.ipinfo) {
             // ipinfo not ready yet (async HTTP call still pending), retry in 1 second
+            if (window.settings.debug) console.log("[Globe] ipinfo not ready, retrying in 1s");
             setTimeout(() => this.updateLoc(), 1000);
+        } else if (!window.mods.netstat.ipinfo.geo) {
+            // ipinfo exists but geo is null (geoLookup couldn't locate the IP)
+            // Show IP coordinates as unknown rather than mock
+            if (window.settings.debug) console.log("[Globe] ipinfo.geo is null, showing coordinates as unknown");
+            this.updateWithUnknownGeo();
         } else {
             this.updateConOnlineConnection().then(() => {
                 document.querySelector("div#mod_globe").setAttribute("class", "");
@@ -204,6 +215,28 @@ class LocationGlobe {
             this._locMarker = this.globe.addMarker(mockGeo.latitude, mockGeo.longitude, "", false, 1.2);
         }
         this.lastgeo = mockGeo;
+    }
+    updateWithUnknownGeo() {
+        // Have IP but geoLookup couldn't locate it - show unknown coordinates
+        // Use a default location (0, 0) but without "(MOCK)" to indicate we're online
+        const unknownGeo = {
+            latitude: 0,
+            longitude: 0
+        };
+
+        document.querySelector("div#mod_globe").setAttribute("class", "");
+        document.querySelector("i.mod_globe_headerInfo").innerText = `IP: ${window.mods.netstat.ipinfo.ip} (GEO N/A)`;
+
+        if (unknownGeo.latitude !== this.lastgeo.latitude || unknownGeo.longitude !== this.lastgeo.longitude) {
+            this.removePins();
+            this.removeMarkers();
+            this.conns = [];
+
+            // Still add a pin at (0,0) to show the globe is active
+            this._locPin = this.globe.addPin(unknownGeo.latitude, unknownGeo.longitude, "", 1.2);
+            this._locMarker = this.globe.addMarker(unknownGeo.latitude, unknownGeo.longitude, "", false, 1.2);
+        }
+        this.lastgeo = unknownGeo;
     }
     async updateConOnlineConnection() {
         let newgeo = window.mods.netstat.ipinfo.geo;

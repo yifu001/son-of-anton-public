@@ -176,9 +176,17 @@ class Netstat {
                         res.on("end", () => {
                             try {
                                 let data = JSON.parse(rawData);
+                                if (window.settings.debug) console.log("[Netstat] External IP response:", rawData);
+
+                                // Safely get geo data - geoLookup.get() may return null
+                                const geoData = this.geoLookup.get(data.ip);
+                                const geo = geoData && geoData.location ? geoData.location : null;
+
+                                if (window.settings.debug) console.log("[Netstat] GeoLookup result for", data.ip, ":", geoData ? "found" : "null");
+
                                 this.ipinfo = {
                                     ip: data.ip,
-                                    geo: this.geoLookup.get(data.ip).location
+                                    geo: geo
                                 };
 
                                 let ip = this.ipinfo.ip;
