@@ -75,7 +75,7 @@ See: .planning/PROJECT.md
 - Todo status priority: in_progress->RUNNING, all completed->COMPLETE, any pending->PENDING
 - mtime fallback: <10s = RUNNING, <30min = PENDING, else COMPLETE
 - 5-second subagent polling: Reliable fallback when chokidar glob watching fails
-- Agent naming: Prefer slug title-case, fallback to task word extraction (max 30 chars)
+- Agent naming: Extract from task description only (slug is session-scoped, not agent-specific)
 - AgentList status priority: RUNNING=0, PENDING=1, COMPLETE=2, FAILED=3
 - Agent pulse animation: 1.5s ease-in-out infinite for running status
 - TodoWidget status mapping: in_progress -> running, pending -> pending, completed -> completed

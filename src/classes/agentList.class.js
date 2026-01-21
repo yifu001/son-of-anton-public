@@ -52,34 +52,63 @@ class AgentList {
         return filtered.slice(0, 5);
     }
 
-    _generateAgentName(task, slug) {
-        // Prefer slug if available (Claude provides these)
-        if (slug) {
-            // Convert slug like "lively-percolating-cerf" to "Lively Percolating Cerf"
-            return slug.split('-')
-                .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-                .join(' ');
-        }
-
-        // Fallback: extract 2-4 words from task description
+    _generateAgentName(task) {
+        // Extract meaningful name from task description
+        // Note: slug is session-scoped, not agent-specific, so we don't use it
         if (!task || task === 'Unknown task') return 'Agent Task';
 
-        const firstSentence = task.split(/[.!?\n]/)[0] || task;
-        const cleaned = firstSentence.slice(0, 100).trim()
+        // Strip XML-like tags (e.g., <objective>, <planning_context>)
+        let text = task.replace(/<[^>]+>/g, ' ').trim();
+
+        // Get lines and find first meaningful one (skip metadata-only lines)
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        let bestLine = '';
+        for (const line of lines) {
+            // Skip metadata lines
+            if (/^\*\*[^*]+\*\*:?\s*[\w\d.-]*\s*$/.test(line)) continue;  // **Label:** short_value
+            if (/^@/.test(line)) continue;  // @file references
+            if (/^[-=]+$/.test(line)) continue;  // Separators
+            if (line.length < 10) continue;  // Too short to be meaningful
+            bestLine = line;
+            break;
+        }
+        if (!bestLine) bestLine = lines[0] || text;
+
+        // Take first sentence or phrase
+        const firstSentence = bestLine.split(/[.!?]/)[0] || bestLine;
+
+        // Clean up common prefixes
+        let cleaned = firstSentence.slice(0, 150).trim()
+            .replace(/^\*\*[^*]+\*\*:?\s*/i, '')  // Strip markdown bold headers
             .replace(/^(please |can you |could you |i need |let's |now )/i, '')
-            .replace(/^(implement |create |fix |update |add |remove |change |modify )/i, '$1');
+            .replace(/^(verify |research |execute |implement |create |fix |update |add )/i, '')
+            .replace(/^(phase[:\s]*\d+[\s:-]*)?(goal\s+)?/i, '')
+            .replace(/^(plan[:\s]*\d+\s*(of\s+)?)/i, '')
+            .replace(/^achievement\s*/i, '');
 
-        const words = cleaned.split(/\s+/)
-            .filter(w => w.length > 2)
-            .slice(0, 4)
-            .map(w => w.replace(/[^a-zA-Z0-9]/g, ''));
+        // Extract meaningful words (skip short/common words)
+        const stopWords = new Set(['the', 'and', 'for', 'with', 'from', 'into', 'that', 'this', 'will', 'how', 'each', 'task', 'phase', 'directory', 'planning', 'phases']);
+        const words = cleaned.split(/[\s-]+/)
+            .map(w => w.replace(/[^a-zA-Z0-9]/g, ''))
+            .filter(w => w.length > 2 && !stopWords.has(w.toLowerCase()) && !/^\d+$/.test(w))
+            .slice(0, 4);
 
-        const name = words
+        let name = words
             .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
             .join(' ');
 
+        // Fallback: try to extract phase name from paths in the task
+        if (!name) {
+            const phaseMatch = task.match(/phases?\/\d+[-.]?([\w-]+)/i);
+            if (phaseMatch && phaseMatch[1]) {
+                name = phaseMatch[1].split('-')
+                    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+                    .join(' ');
+            }
+        }
+
         // Max 30 chars with ellipsis
-        if (name.length > 30) {
+        if (name && name.length > 30) {
             return name.slice(0, 27) + '...';
         }
 
@@ -126,7 +155,7 @@ class AgentList {
 
         let html = '';
         agents.forEach((agent, index) => {
-            const name = this._generateAgentName(agent.task, agent.slug);
+            const name = this._generateAgentName(agent.task);
             const statusClass = agent.status.toLowerCase();
             const taskPreview = this._truncateTask(agent.task, 60);
             const fullTask = this._escapeHtml(agent.task || 'No task description');
