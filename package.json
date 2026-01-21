@@ -112,6 +112,7 @@
     "cson-parser": "4.0.9"
   },
   "devDependencies": {
+    "jimp": "^0.16.1",
     "png2icons": "^2.0.1"
   }
 }
