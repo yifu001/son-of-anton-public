@@ -223,27 +223,7 @@ Plans:
 
 ---
 
-## Phase 8: Tools/MCP Display
-
-**Goal:** Users see connected MCP servers and active tools.
-
-**Requirements:**
-- TOOL-01: Widget shows connected MCP servers with status
-- TOOL-02: Widget shows currently active tools
-- TOOL-03: Tools widget positioned below todo list on right side
-
-**Success Criteria:**
-1. MCP servers listed with connection status (green=connected, red=disconnected)
-2. Active tools displayed with name (truncated if >20 chars)
-3. Widget positioned below todo list in right sidebar
-4. Empty state shown when no MCP servers configured
-5. Server/tool data parsed from `.mcp.json` and Claude state
-
-**Dependencies:** Phase 4 (state infrastructure), Phase 7 (establishes widget order)
-
----
-
-## Phase 8.1: Silent Failures Fix
+## Phase 8: Silent Failures Fix
 
 **Goal:** Eliminate silent error suppression patterns that make debugging impossible.
 
@@ -264,7 +244,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [x] 08.1-01-PLAN.md — Fix all silent failure patterns in claudeState.class.js and _renderer.js
+- [x] 08-01-PLAN.md — Fix all silent failure patterns in claudeState.class.js and _renderer.js
 
 **Status:** Complete (2026-01-21)
 
@@ -324,12 +304,11 @@ Plans:
 | 5.1 | Quick Fixes & Branding | ✓ Complete | 2 |
 | 6 | Agent Visibility | ✓ Complete | 4 |
 | 7 | Todo Display | ✓ Complete | 3 |
-| 8 | Tools/MCP Display | Pending | 3 |
-| 8.1 | Silent Failures Fix | ✓ Complete | 3 |
+| 8 | Silent Failures Fix | ✓ Complete | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Total:** 32 requirements across 12 phases
+**Total:** 29 requirements across 11 phases
 
 ---
 

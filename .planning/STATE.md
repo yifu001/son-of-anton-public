@@ -1,14 +1,14 @@
 # Project State
 
 **Project:** Son of Anton
-**Current Phase:** 8.1
+**Current Phase:** 8
 **Status:** Complete
 
 ## Project Reference
 
 See: .planning/PROJECT.md
 **Core value:** Real-time visibility and control over Claude Code sessions
-**Current focus:** Phase 8.1 - Silent Failures Fix
+**Current focus:** Phase 8 - Silent Failures Fix
 
 ## Progress
 
@@ -22,16 +22,15 @@ See: .planning/PROJECT.md
 | 5.1 | Quick Fixes & Branding | Complete (2/2 plans) | 2 |
 | 6 | Agent Visibility | Complete (2/2 plans) | 4 |
 | 7 | Todo Display | Complete (1/1 plans) | 3 |
-| 8 | Tools/MCP Display | Pending | 3 |
-| 8.1 | Silent Failures Fix | Complete (1/1 plans) | 3 |
+| 8 | Silent Failures Fix | Complete (1/1 plans) | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Progress:** [█████████.] 9/12 phases complete
+**Progress:** [█████████.] 9/11 phases complete
 
 ## Current Position
 
-- **Phase:** 8.1 - Silent Failures Fix
+- **Phase:** 8 - Silent Failures Fix
 - **Plan:** 1 of 1 complete
 - **Status:** Complete
 
@@ -40,7 +39,7 @@ See: .planning/PROJECT.md
 | Metric | Value |
 |--------|-------|
 | Phases completed | 9 |
-| Requirements delivered | 24/27 |
+| Requirements delivered | 24/29 |
 | Plans executed | 15 |
 
 ## Accumulated Context

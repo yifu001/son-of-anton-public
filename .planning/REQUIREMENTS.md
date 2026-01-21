@@ -35,12 +35,6 @@
 - [x] **TODO-02**: Todo status displayed: running, pending, completed
 - [x] **TODO-03**: Todo list positioned below context widget on right side
 
-### Tools/MCP Display
-
-- [ ] **TOOL-01**: Widget shows connected MCP servers with status
-- [ ] **TOOL-02**: Widget shows currently active tools
-- [ ] **TOOL-03**: Tools widget positioned below todo list on right side
-
 ### Terminal Management
 
 - [x] **TERM-01**: Terminal names are user-editable (click to rename)
@@ -72,11 +66,6 @@
 - **AGENT-06**: Agent dependency visualization
 - **AGENT-07**: Agent output preview
 - **AGENT-08**: Kill agent from UI
-
-### Tool History
-
-- **TOOL-04**: Tool call history with timestamps
-- **TOOL-05**: Tool performance metrics
 
 ## Out of Scope
 
@@ -110,9 +99,6 @@
 | TODO-01 | 7 | Complete |
 | TODO-02 | 7 | Complete |
 | TODO-03 | 7 | Complete |
-| TOOL-01 | 8 | Pending |
-| TOOL-02 | 8 | Pending |
-| TOOL-03 | 8 | Pending |
 | TERM-01 | 2 | Complete |
 | TERM-02 | 2 | Complete |
 | TERM-03 | 2 | Complete |
@@ -121,8 +107,8 @@
 | FIX-03 | 1 | Complete |
 
 **Coverage:**
-- v1 requirements: 27 total
-- Mapped to phases: 27
+- v1 requirements: 24 total
+- Mapped to phases: 24
 - Unmapped: 0
 
 ---
