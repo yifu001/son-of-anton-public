@@ -155,6 +155,12 @@ Plans:
 
 **Dependencies:** None
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 05.1-01-PLAN.md — Debug and fix network/globe/CWD issues on Windows
+- [ ] 05.1-02-PLAN.md — Generate and deploy new app icons
+
 **Source:** Captured from pending todos (2026-01-20)
 
 ---
