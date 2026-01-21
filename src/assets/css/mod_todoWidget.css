@@ -1,0 +1,215 @@
+/* TodoWidget - Task list display styling */
+
+div#mod_todoWidget {
+    border-top: 0.092vh solid rgba(var(--color_r), var(--color_g), var(--color_b), 0.3);
+    font-family: var(--font_main_light);
+    letter-spacing: 0.092vh;
+    padding: 0.645vh 0vh;
+    display: flex;
+}
+
+div#mod_todoWidget::before {
+    content: "";
+    border-left: 0.092vh solid rgba(var(--color_r), var(--color_g), var(--color_b), 0.3);
+    align-self: flex-start;
+    position: relative;
+    left: -0.092vh;
+    top: -1.111vh;
+    height: 0.833vh;
+}
+
+div#mod_todoWidget::after {
+    content: "";
+    border-right: 0.092vh solid rgba(var(--color_r), var(--color_g), var(--color_b), 0.3);
+    position: relative;
+    right: -0.092vh;
+    top: -1.111vh;
+    height: 0.833vh;
+}
+
+div#mod_todoWidget_innercontainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+div#mod_todoWidget h1 {
+    font-size: 1.48vh;
+    margin: 0vh;
+    margin-bottom: 0.3vh;
+    width: 98%;
+}
+
+span.mod_todoWidget_count {
+    font-size: 1.20vh;
+    opacity: 0.7;
+    font-weight: normal;
+}
+
+div#mod_todoWidget_content {
+    width: 100%;
+    max-height: 15vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(var(--color_r), var(--color_g), var(--color_b), 0.3) transparent;
+}
+
+/* Hide scrollbar by default, show on hover */
+div#mod_todoWidget_content::-webkit-scrollbar {
+    width: 4px;
+    opacity: 0;
+}
+
+div#mod_todoWidget_content:hover::-webkit-scrollbar {
+    opacity: 1;
+}
+
+div#mod_todoWidget_content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+div#mod_todoWidget_content::-webkit-scrollbar-thumb {
+    background: rgba(var(--color_r), var(--color_g), var(--color_b), 0.3);
+    border-radius: 2px;
+}
+
+div#mod_todoWidget_content::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--color_r), var(--color_g), var(--color_b), 0.5);
+}
+
+/* Task item */
+.todo-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.3vh 0;
+    border-bottom: 1px dotted rgba(var(--color_r), var(--color_g), var(--color_b), 0.15);
+}
+
+.todo-item:last-child {
+    border-bottom: none;
+}
+
+/* Task index number */
+.todo-index {
+    min-width: 2em;
+    opacity: 0.6;
+    font-size: 1.2vh;
+    flex-shrink: 0;
+}
+
+/* Status icons */
+.todo-status-icon {
+    display: inline-block;
+    width: 1.2vh;
+    height: 1.2vh;
+    flex-shrink: 0;
+    margin-right: 0.5vh;
+    margin-top: 0.1vh;
+    position: relative;
+}
+
+/* Running status - spinner animation */
+.todo-status-icon.running {
+    border: 2px solid rgba(var(--color_r), var(--color_g), var(--color_b), 0.3);
+    border-top: 2px solid rgb(var(--color_r), var(--color_g), var(--color_b));
+    border-radius: 50%;
+    animation: todoSpinner 1s linear infinite;
+}
+
+@keyframes todoSpinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Pending status - hollow circle */
+.todo-status-icon.pending {
+    border: 2px solid rgba(var(--color_r), var(--color_g), var(--color_b), 0.5);
+    border-radius: 50%;
+    background: transparent;
+}
+
+/* Completed status - checkmark */
+.todo-status-icon.completed {
+    border: none;
+}
+
+.todo-status-icon.completed::after {
+    content: "";
+    position: absolute;
+    left: 0.3vh;
+    top: 0;
+    width: 0.4vh;
+    height: 0.8vh;
+    border: solid rgba(var(--color_r), var(--color_g), var(--color_b), 0.7);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Task content */
+.todo-content {
+    font-size: 1.2vh;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    color: rgba(var(--color_r), var(--color_g), var(--color_b), 0.9);
+}
+
+/* Completed section */
+.todo-completed-section {
+    border-top: 1px solid rgba(var(--color_r), var(--color_g), var(--color_b), 0.2);
+    margin-top: 0.5vh;
+    padding-top: 0.3vh;
+}
+
+.todo-completed-section summary {
+    cursor: pointer;
+    font-size: 1.1vh;
+    opacity: 0.6;
+    list-style: none;
+    padding: 0.2vh 0;
+    user-select: none;
+}
+
+.todo-completed-section summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Arrow indicators for summary */
+.todo-completed-section summary::before {
+    content: "▶ ";
+    font-size: 0.8vh;
+    margin-right: 0.3vh;
+}
+
+.todo-completed-section[open] summary::before {
+    content: "▼ ";
+}
+
+/* Completed items dimmed */
+.completed-items {
+    opacity: 0.5;
+}
+
+.completed-items .todo-item {
+    padding: 0.2vh 0;
+}
+
+/* Empty state */
+.todo-empty {
+    text-align: center;
+    opacity: 0.5;
+    padding: 1vh 0;
+    font-size: 1.2vh;
+}
+
+/* Active section */
+.todo-active-section {
+    padding-bottom: 0.3vh;
+}
