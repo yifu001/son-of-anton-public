@@ -24,8 +24,10 @@ class ClaudeStateManager {
             projects: {},
             todos: {},
             liveContext: null,  // Real-time context from statusline
+            agents: [],  // Subagent data from ~/.claude/projects/*/subagents/
             lastUpdate: null
         };
+        this.projectsDir = path.join(this.claudeDir, 'projects');
         this._updateTimeout = null;
         this._pollInterval = null;
         this._lastLiveContextMtime = 0;
@@ -80,6 +82,21 @@ class ClaudeStateManager {
 
         // Polling fallback for live context (chokidar may miss external writes on Windows)
         this._pollInterval = setInterval(() => this._pollLiveContext(), 2000);
+
+        // Watch subagent directories: ~/.claude/projects/*/subagents/ and ~/.claude/projects/*/*/subagents/
+        const subagentGlobPatterns = [
+            path.join(this.projectsDir, '*', 'subagents', 'agent-*.jsonl'),
+            path.join(this.projectsDir, '*', '*', 'subagents', 'agent-*.jsonl')
+        ];
+        const subagentWatcher = chokidar.watch(subagentGlobPatterns, watcherOptions);
+        subagentWatcher.on('add', (filepath) => this._handleSubagentChange(filepath));
+        subagentWatcher.on('change', (filepath) => this._handleSubagentChange(filepath));
+        subagentWatcher.on('unlink', (filepath) => this._handleSubagentChange(filepath));
+        subagentWatcher.on('error', (error) => this._handleError('subagents', error));
+        this.watchers.push(subagentWatcher);
+
+        // Initial scan of subagents
+        this._scanAllAgents();
     }
 
     /**
@@ -195,6 +212,202 @@ class ClaudeStateManager {
             this.state.lastUpdate = Date.now();
             this._sendUpdate();
         }
+    }
+
+    /**
+     * Handle changes to subagent files
+     * @param {string} filepath - Path to changed agent file
+     */
+    _handleSubagentChange(filepath) {
+        const filename = path.basename(filepath);
+        // Only process agent-*.jsonl files
+        if (!filename.startsWith('agent-') || !filename.endsWith('.jsonl')) {
+            return;
+        }
+        // Rescan all agents on any change (simpler than incremental updates)
+        this._scanAllAgents();
+    }
+
+    /**
+     * Scan all subagent directories and update state
+     */
+    _scanAllAgents() {
+        const agents = [];
+        const now = Date.now();
+        const oneDayAgo = now - (24 * 60 * 60 * 1000);
+
+        try {
+            if (!fs.existsSync(this.projectsDir)) {
+                this.state.agents = [];
+                this._sendUpdate();
+                return;
+            }
+
+            // Scan projects directory
+            const projects = fs.readdirSync(this.projectsDir);
+            for (const project of projects) {
+                const projectPath = path.join(this.projectsDir, project);
+                try {
+                    const projectStat = fs.statSync(projectPath);
+                    if (!projectStat.isDirectory()) continue;
+
+                    // Check for direct subagents/ directory
+                    const directSubagents = path.join(projectPath, 'subagents');
+                    if (fs.existsSync(directSubagents)) {
+                        this._scanSubagentsDir(directSubagents, agents, oneDayAgo, null);
+                    }
+
+                    // Check for session-scoped subagents: project/session-id/subagents/
+                    const subdirs = fs.readdirSync(projectPath);
+                    for (const subdir of subdirs) {
+                        const subdirPath = path.join(projectPath, subdir);
+                        try {
+                            const subdirStat = fs.statSync(subdirPath);
+                            if (!subdirStat.isDirectory()) continue;
+
+                            const sessionSubagents = path.join(subdirPath, 'subagents');
+                            if (fs.existsSync(sessionSubagents)) {
+                                // subdir name is the session ID
+                                this._scanSubagentsDir(sessionSubagents, agents, oneDayAgo, subdir);
+                            }
+                        } catch (e) {
+                            // Ignore errors for individual subdirs
+                        }
+                    }
+                } catch (e) {
+                    // Ignore errors for individual projects
+                }
+            }
+
+            // Deduplicate by agentId (keep most recent)
+            const agentMap = new Map();
+            for (const agent of agents) {
+                const existing = agentMap.get(agent.id);
+                if (!existing || agent.mtime > existing.mtime) {
+                    agentMap.set(agent.id, agent);
+                }
+            }
+
+            // Sort by mtime descending (most recent first)
+            const sortedAgents = Array.from(agentMap.values())
+                .sort((a, b) => b.mtime - a.mtime)
+                .slice(0, 20); // Limit to 20 agents
+
+            this.state.agents = sortedAgents;
+            this.state.lastUpdate = Date.now();
+            this._sendUpdate();
+        } catch (error) {
+            console.error('ClaudeStateManager: Error scanning agents:', error.message);
+        }
+    }
+
+    /**
+     * Scan a single subagents directory and add agents to array
+     * @param {string} subagentsDir - Path to subagents directory
+     * @param {Array} agents - Array to add agents to
+     * @param {number} cutoffTime - Only include agents modified after this time
+     * @param {string|null} sessionId - Parent session ID if known
+     */
+    _scanSubagentsDir(subagentsDir, agents, cutoffTime, sessionId) {
+        try {
+            const files = fs.readdirSync(subagentsDir);
+            for (const file of files) {
+                if (!file.startsWith('agent-') || !file.endsWith('.jsonl')) continue;
+
+                const filepath = path.join(subagentsDir, file);
+                try {
+                    const stat = fs.statSync(filepath);
+                    const mtime = stat.mtimeMs;
+
+                    // Filter to agents modified in last 24 hours
+                    if (mtime < cutoffTime) continue;
+
+                    // Extract agent ID from filename: agent-{id}.jsonl
+                    const agentId = file.replace('agent-', '').replace('.jsonl', '');
+
+                    // Parse first line for task description and slug
+                    let task = 'Unknown task';
+                    let slug = null;
+                    let agentSessionId = sessionId;
+
+                    try {
+                        const content = fs.readFileSync(filepath, 'utf-8');
+                        const firstLine = content.split('\n')[0];
+                        if (firstLine) {
+                            const data = JSON.parse(firstLine);
+                            slug = data.slug || null;
+                            agentSessionId = data.sessionId || sessionId;
+
+                            if (data.message && data.message.content) {
+                                const msgContent = data.message.content;
+                                if (typeof msgContent === 'string') {
+                                    task = msgContent.slice(0, 200);
+                                } else if (Array.isArray(msgContent) && msgContent[0]) {
+                                    task = (msgContent[0].text || '').slice(0, 200);
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        // Ignore parse errors, use defaults
+                    }
+
+                    const status = this._getAgentStatus(agentSessionId, agentId, mtime);
+
+                    agents.push({
+                        id: agentId,
+                        slug: slug,
+                        task: task,
+                        status: status,
+                        mtime: mtime,
+                        sessionId: agentSessionId
+                    });
+                } catch (e) {
+                    // Ignore errors for individual files
+                }
+            }
+        } catch (error) {
+            // Ignore errors reading directory
+        }
+    }
+
+    /**
+     * Get agent status from todo file or mtime fallback
+     * @param {string|null} sessionId - Session ID
+     * @param {string} agentId - Agent ID
+     * @param {number} mtime - File modification time
+     * @returns {string} Status: PENDING | RUNNING | COMPLETE | FAILED
+     */
+    _getAgentStatus(sessionId, agentId, mtime) {
+        // Try to get status from todo file
+        if (sessionId) {
+            const todoFilename = `${sessionId}-agent-${agentId}.json`;
+            const todoPath = path.join(this.todosDir, todoFilename);
+
+            try {
+                if (fs.existsSync(todoPath)) {
+                    const content = fs.readFileSync(todoPath, 'utf-8');
+                    const todos = JSON.parse(content);
+
+                    if (Array.isArray(todos) && todos.length > 0) {
+                        const hasInProgress = todos.some(t => t.status === 'in_progress');
+                        const allCompleted = todos.every(t => t.status === 'completed');
+                        const hasPending = todos.some(t => t.status === 'pending');
+
+                        if (hasInProgress) return 'RUNNING';
+                        if (allCompleted) return 'COMPLETE';
+                        if (hasPending) return 'PENDING';
+                    }
+                }
+            } catch (e) {
+                // Fall through to mtime heuristic
+            }
+        }
+
+        // Fallback to mtime-based heuristic
+        const timeSinceModified = Date.now() - mtime;
+        if (timeSinceModified < 10000) return 'RUNNING';        // < 10 seconds
+        if (timeSinceModified < 30 * 60 * 1000) return 'PENDING'; // < 30 minutes
+        return 'COMPLETE'; // Assume finished if not recently modified
     }
 
     /**
