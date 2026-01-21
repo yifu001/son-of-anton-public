@@ -2,13 +2,13 @@
 
 **Project:** Son of Anton
 **Current Phase:** 7
-**Status:** Ready
+**Status:** In Progress
 
 ## Project Reference
 
 See: .planning/PROJECT.md
 **Core value:** Real-time visibility and control over Claude Code sessions
-**Current focus:** Phase 7 - Todo Display (next phase)
+**Current focus:** Phase 7 - Todo Display
 
 ## Progress
 
@@ -21,18 +21,18 @@ See: .planning/PROJECT.md
 | 5 | Context Tracking Display | Complete | 3 |
 | 5.1 | Quick Fixes & Branding | Complete (2/2 plans) | 2 |
 | 6 | Agent Visibility | Complete (2/2 plans) | 4 |
-| 7 | Todo Display | Pending | 3 |
+| 7 | Todo Display | In Progress (1/? plans) | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Progress:** [███████...] 7/11 phases complete
+**Progress:** [███████░..] 7/11 phases complete
 
 ## Current Position
 
 - **Phase:** 7 - Todo Display
-- **Plan:** 0 of ? complete
-- **Status:** Ready for planning
+- **Plan:** 1 of ? complete
+- **Status:** Plan 01 complete
 
 ## Performance Metrics
 
@@ -40,7 +40,7 @@ See: .planning/PROJECT.md
 |--------|-------|
 | Phases completed | 7 |
 | Requirements delivered | 18/27 |
-| Plans executed | 12 |
+| Plans executed | 13 |
 
 ## Accumulated Context
 
@@ -78,6 +78,10 @@ See: .planning/PROJECT.md
 - Agent naming: Prefer slug title-case, fallback to task word extraction (max 30 chars)
 - AgentList status priority: RUNNING=0, PENDING=1, COMPLETE=2, FAILED=3
 - Agent pulse animation: 1.5s ease-in-out infinite for running status
+- TodoWidget status mapping: in_progress -> running, pending -> pending, completed -> completed
+- Todo content fallback: content || description || title || 'Task'
+- TodoWidget spinner: 1s linear infinite rotation
+- TodoWidget position: 4th in right column (after conninfo)
 
 ### Technical Notes
 - Node 16.x required (Electron 12 ABI compatibility)
@@ -89,7 +93,7 @@ See: .planning/PROJECT.md
 - Terminal names stored in: %APPDATA%/Son of Anton/terminalNames.json
 - Active tab glow: box-shadow with CSS keyframes animation for voice input indicator
 - Right-column widget pattern: border-top, ::before/::after corner accents, flex display
-- Widget instantiation order: netstat -> globe -> conninfo -> context -> agentList
+- Widget instantiation order: netstat -> globe -> conninfo -> todoWidget -> agentList
 - ClaudeStateManager watches ~/.claude.json and ~/.claude/todos/
 - IPC channel: claude-state-update broadcasts state to renderer
 - Renderer globals: window.claudeState, window.terminalSessions
@@ -100,6 +104,7 @@ See: .planning/PROJECT.md
 - ClaudeStateManager.state.agents: Array of {id, slug, task, status, mtime, sessionId}
 - Agent status values: PENDING, RUNNING, COMPLETE, FAILED
 - AgentList widget: Event-driven via claude-state-changed, two-line layout with expand
+- TodoWidget: Event-driven via claude-state-changed, collapsible completed section
 
 ### Blockers
 - (none)
@@ -215,10 +220,21 @@ See: .planning/PROJECT.md
 
 **Summary:** .planning/phases/06-agent-visibility/06-02-SUMMARY.md
 
+## Phase 7 Progress
+
+### Plan 01: Todo Display Widget
+**Completed:** 2026-01-21
+**Commits:**
+- `4972701` feat(07-01): create TodoWidget class for task list display
+- `6ffe3ea` style(07-01): add TodoWidget CSS with status icons and animations
+- `fd1c57b` feat(07-01): integrate TodoWidget into application
+
+**Summary:** .planning/phases/07-todo-display/07-01-SUMMARY.md
+
 ## Session Continuity
 
-**Last session:** 2026-01-21 - Completed 06-02-PLAN.md (AgentList Widget Refactor)
-**Next action:** Plan Phase 7 (Todo Display)
+**Last session:** 2026-01-21 - Completed 07-01-PLAN.md (Todo Display Widget)
+**Next action:** Continue Phase 7 or proceed to Phase 8
 
 ---
 *State initialized: 2026-01-20*
