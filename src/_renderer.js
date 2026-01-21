@@ -1056,8 +1056,15 @@ window.openSettings = async () => {
     });
 };
 
-window.writeFile = (path) => {
-    fs.writeFile(path, document.getElementById("fileEdit").value, "utf-8", () => {
+window.writeFile = (filePath) => {
+    fs.writeFile(filePath, document.getElementById("fileEdit").value, "utf-8", (err) => {
+        if (err) {
+            document.getElementById("fedit-status").innerHTML = `<i style="color: var(--color_red);">Save failed: ${window._escapeHtml(err.message)}</i>`;
+            if (window.settings && window.settings.debug) {
+                console.error("[Renderer] File write failed:", filePath, err.message);
+            }
+            return;
+        }
         document.getElementById("fedit-status").innerHTML = "<i>File saved.</i>";
     });
 };
@@ -1102,8 +1109,15 @@ window.writeSettingsFile = () => {
         }
     });
 
-    fs.writeFileSync(settingsFile, JSON.stringify(window.settings, "", 4));
-    document.getElementById("settingsEditorStatus").innerText = "New values written to settings.json file at " + new Date().toTimeString();
+    try {
+        fs.writeFileSync(settingsFile, JSON.stringify(window.settings, "", 4));
+        document.getElementById("settingsEditorStatus").innerText = "New values written to settings.json file at " + new Date().toTimeString();
+    } catch (err) {
+        document.getElementById("settingsEditorStatus").innerText = "Save failed: " + err.message;
+        if (window.settings && window.settings.debug) {
+            console.error("[Renderer] Settings write failed:", err.message);
+        }
+    }
 };
 
 window.toggleFullScreen = () => {
@@ -1113,7 +1127,13 @@ window.toggleFullScreen = () => {
     //Update settings
     window.lastWindowState["useFullscreen"] = useFullscreen;
 
-    fs.writeFileSync(lastWindowStateFile, JSON.stringify(window.lastWindowState, "", 4));
+    try {
+        fs.writeFileSync(lastWindowStateFile, JSON.stringify(window.lastWindowState, "", 4));
+    } catch (err) {
+        if (window.settings && window.settings.debug) {
+            console.error("[Renderer] Window state save failed:", err.message);
+        }
+    }
 };
 
 // Display available keyboard shortcuts and custom shortcuts helper
