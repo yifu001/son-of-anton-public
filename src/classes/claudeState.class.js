@@ -18,13 +18,17 @@ class ClaudeStateManager {
         this.claudeDir = path.join(os.homedir(), '.claude');
         this.claudeJsonPath = path.join(os.homedir(), '.claude.json');
         this.todosDir = path.join(this.claudeDir, 'todos');
+        this.liveContextPath = path.join(this.claudeDir, 'cache', 'context-live.json');
         this.watchers = [];
         this.state = {
             projects: {},
             todos: {},
+            liveContext: null,  // Real-time context from statusline
             lastUpdate: null
         };
         this._updateTimeout = null;
+        this._pollInterval = null;
+        this._lastLiveContextMtime = 0;
     }
 
     /**
@@ -59,6 +63,44 @@ class ClaudeStateManager {
         todosWatcher.on('unlink', (filepath) => this._handleTodoRemove(filepath));
         todosWatcher.on('error', (error) => this._handleError('todos', error));
         this.watchers.push(todosWatcher);
+
+        // Watch ~/.claude/cache/context-live.json for real-time context data
+        const liveContextWatcherOptions = {
+            ...watcherOptions,
+            awaitWriteFinish: {
+                stabilityThreshold: 100,  // Faster updates for live data
+                pollInterval: 50
+            }
+        };
+        const liveContextWatcher = chokidar.watch(this.liveContextPath, liveContextWatcherOptions);
+        liveContextWatcher.on('add', (filepath) => this._handleLiveContextChange(filepath));
+        liveContextWatcher.on('change', (filepath) => this._handleLiveContextChange(filepath));
+        liveContextWatcher.on('error', (error) => this._handleError('liveContext', error));
+        this.watchers.push(liveContextWatcher);
+
+        // Polling fallback for live context (chokidar may miss external writes on Windows)
+        this._pollInterval = setInterval(() => this._pollLiveContext(), 2000);
+    }
+
+    /**
+     * Poll live context file for changes (fallback for unreliable chokidar)
+     */
+    _pollLiveContext() {
+        try {
+            if (!fs.existsSync(this.liveContextPath)) {
+                return;
+            }
+            const stats = fs.statSync(this.liveContextPath);
+            const mtime = stats.mtimeMs;
+
+            // Only process if file was modified since last poll
+            if (mtime > this._lastLiveContextMtime) {
+                this._lastLiveContextMtime = mtime;
+                this._handleLiveContextChange(this.liveContextPath);
+            }
+        } catch (error) {
+            // Ignore polling errors
+        }
     }
 
     /**
@@ -68,6 +110,10 @@ class ClaudeStateManager {
         if (this._updateTimeout) {
             clearTimeout(this._updateTimeout);
             this._updateTimeout = null;
+        }
+        if (this._pollInterval) {
+            clearInterval(this._pollInterval);
+            this._pollInterval = null;
         }
         this.watchers.forEach(watcher => watcher.close());
         this.watchers = [];
@@ -136,6 +182,19 @@ class ClaudeStateManager {
         delete this.state.todos[sessionId];
         this.state.lastUpdate = Date.now();
         this._sendUpdate();
+    }
+
+    /**
+     * Handle changes to live context file (real-time data from statusline)
+     * @param {string} filepath - Path to changed file
+     */
+    _handleLiveContextChange(filepath) {
+        const data = this._safeParseJson(filepath, null);
+        if (data && data.context_window) {
+            this.state.liveContext = data;
+            this.state.lastUpdate = Date.now();
+            this._sendUpdate();
+        }
     }
 
     /**
