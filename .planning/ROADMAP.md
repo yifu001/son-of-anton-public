@@ -186,6 +186,14 @@ Plans:
 
 **Dependencies:** Phase 4 (state infrastructure)
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Extend ClaudeStateManager for agent watching and state aggregation
+- [ ] 06-02-PLAN.md — Refactor AgentList widget with IPC events and status display
+
+**Status:** Pending
+
 ---
 
 ## Phase 7: Todo Display
