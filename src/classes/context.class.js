@@ -198,15 +198,18 @@ class ContextWidget {
         const formattedMax = this._formatTokens(maxTokens);
         this.textEl.textContent = `${formattedUsed} / ${formattedMax} (${percentage}%)`;
 
-        // Get warning threshold from settings (default 80%)
-        const threshold = window.settings?.contextWarningThreshold || 80;
+        // Remove all color state classes first
+        this.containerEl.classList.remove('caution', 'elevated', 'warning');
 
-        // Add/remove warning class based on threshold
-        if (percentage >= threshold) {
+        // Apply color class based on percentage thresholds
+        if (percentage >= 80) {
             this.containerEl.classList.add('warning');
-        } else {
-            this.containerEl.classList.remove('warning');
+        } else if (percentage >= 65) {
+            this.containerEl.classList.add('elevated');
+        } else if (percentage >= 50) {
+            this.containerEl.classList.add('caution');
         }
+        // Below 50% = default green (no class needed)
 
         // Add/remove stale class based on data age
         if (isStale) {
@@ -225,8 +228,6 @@ class ContextWidget {
     _render(projectData) {
         const tokens = this._calculateTokens(projectData);
         const percentage = Math.min(100, Math.round((tokens / this.maxTokens) * 100));
-        // DEBUG: Log token calculation
-        console.log(`[Context Debug] Rendering - Input: ${projectData.lastTotalInputTokens || 0}, Output: ${projectData.lastTotalOutputTokens || 0}, CacheCreate: ${projectData.lastTotalCacheCreationInputTokens || 0}, CacheRead: ${projectData.lastTotalCacheReadInputTokens || 0}, Total: ${tokens}`);
 
         // Update progress bar
         this.progressEl.value = percentage;
@@ -235,18 +236,17 @@ class ContextWidget {
         const formattedUsed = this._formatTokens(tokens);
         this.textEl.textContent = `${formattedUsed} / 200k (${percentage}%)`;
 
-        // Get warning threshold from settings (default 80%)
-        const threshold = window.settings.contextWarningThreshold || 80;
+        // Remove all color state classes first
+        this.containerEl.classList.remove('caution', 'elevated', 'warning', 'stale');
 
-        // Add/remove warning class based on threshold
-        if (percentage >= threshold) {
+        // Apply color class based on percentage thresholds
+        if (percentage >= 80) {
             this.containerEl.classList.add('warning');
-        } else {
-            this.containerEl.classList.remove('warning');
+        } else if (percentage >= 65) {
+            this.containerEl.classList.add('elevated');
+        } else if (percentage >= 50) {
+            this.containerEl.classList.add('caution');
         }
-
-        // Remove stale class on fresh data
-        this.containerEl.classList.remove('stale');
 
         // Track last update time
         this.lastUpdate = Date.now();
@@ -258,7 +258,7 @@ class ContextWidget {
     _renderPlaceholder() {
         this.textEl.textContent = '-- / --';
         this.progressEl.value = 0;
-        this.containerEl.classList.remove('warning');
+        this.containerEl.classList.remove('caution', 'elevated', 'warning', 'stale');
     }
 
     /**
