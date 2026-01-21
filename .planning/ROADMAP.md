@@ -189,10 +189,10 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Extend ClaudeStateManager for agent watching and state aggregation
-- [ ] 06-02-PLAN.md — Refactor AgentList widget with IPC events and status display
+- [x] 06-01-PLAN.md — Extend ClaudeStateManager for agent watching and state aggregation
+- [x] 06-02-PLAN.md — Refactor AgentList widget with IPC events and status display
 
-**Status:** Pending
+**Status:** Complete (2026-01-21)
 
 ---
 
@@ -286,7 +286,7 @@ Plans:
 | 4 | Claude Code State Infrastructure | ✓ Complete | 1 |
 | 5 | Context Tracking Display | ✓ Complete | 3 |
 | 5.1 | Quick Fixes & Branding | ✓ Complete | 2 |
-| 6 | Agent Visibility | Pending | 4 |
+| 6 | Agent Visibility | ✓ Complete | 4 |
 | 7 | Todo Display | Pending | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
 | 9 | Voice Foundation | Pending | 3 |

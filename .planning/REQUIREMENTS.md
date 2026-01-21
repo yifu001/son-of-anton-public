@@ -102,10 +102,10 @@
 | CTX-03 | 4 | Complete |
 | CTX-04 | 5 | Complete |
 | CTX-05 | 3 | Complete |
-| AGENT-01 | 6 | Pending |
-| AGENT-02 | 6 | Pending |
-| AGENT-03 | 6 | Pending |
-| AGENT-04 | 6 | Pending |
+| AGENT-01 | 6 | Complete |
+| AGENT-02 | 6 | Complete |
+| AGENT-03 | 6 | Complete |
+| AGENT-04 | 6 | Complete |
 | AGENT-05 | 3 | Complete |
 | TODO-01 | 7 | Pending |
 | TODO-02 | 7 | Pending |
