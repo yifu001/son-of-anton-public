@@ -36,14 +36,32 @@ class AgentList {
     }
 
     _processAgents(agents) {
-        // Filter: only show truly active agents (RUNNING or PENDING)
-        const activeStatuses = new Set(['RUNNING', 'PENDING']);
-        const filtered = agents.filter(a => activeStatuses.has(a.status));
+        const TEN_MINUTES_MS = 10 * 60 * 1000;
+        const now = Date.now();
 
-        // Sort by status priority (RUNNING first, then PENDING) then by mtime
-        const statusPriority = { 'RUNNING': 0, 'PENDING': 1 };
+        // Process agents: assign display status
+        // - RUNNING stays RUNNING (active)
+        // - PENDING stays PENDING
+        // - Others with mtime within 10 min become ONLINE
+        const processed = agents.map(a => {
+            let displayStatus = a.status;
+            if (a.status !== 'RUNNING' && a.status !== 'PENDING') {
+                const age = now - a.mtime;
+                if (age <= TEN_MINUTES_MS) {
+                    displayStatus = 'ONLINE';
+                }
+            }
+            return { ...a, displayStatus };
+        });
+
+        // Filter: show RUNNING, PENDING, or ONLINE
+        const relevantStatuses = new Set(['RUNNING', 'PENDING', 'ONLINE']);
+        const filtered = processed.filter(a => relevantStatuses.has(a.displayStatus));
+
+        // Sort by status priority: RUNNING (active) first, then PENDING, then ONLINE
+        const statusPriority = { 'RUNNING': 0, 'PENDING': 1, 'ONLINE': 2 };
         filtered.sort((a, b) => {
-            const priorityDiff = (statusPriority[a.status] || 99) - (statusPriority[b.status] || 99);
+            const priorityDiff = (statusPriority[a.displayStatus] || 99) - (statusPriority[b.displayStatus] || 99);
             if (priorityDiff !== 0) return priorityDiff;
             return b.mtime - a.mtime;
         });
@@ -156,7 +174,7 @@ class AgentList {
         let html = '';
         agents.forEach((agent, index) => {
             const name = this._generateAgentName(agent.task);
-            const statusClass = agent.status.toLowerCase();
+            const statusClass = (agent.displayStatus || agent.status).toLowerCase();
             const taskPreview = this._truncateTask(agent.task, 60);
             const fullTask = this._escapeHtml(agent.task || 'No task description');
 
