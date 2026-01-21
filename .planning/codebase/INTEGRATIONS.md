@@ -7,7 +7,7 @@
 **GitHub API:**
 - Purpose: Check for application updates
 - File: `src/classes/updateChecker.class.js`
-- Endpoint: `https://api.github.com/repos/GitSquared/edex-ui/releases/latest`
+- Endpoint: `https://api.github.com/repos/yifu001/son-of-anton/releases/latest`
 - Method: GET
 - Authentication: None (public API)
 - Headers: `User-Agent: "Son of Anton UpdateChecker"`

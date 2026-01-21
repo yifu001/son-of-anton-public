@@ -92,6 +92,13 @@ The `AgentList` class monitors Claude Code subagents by:
 - Added `TodoWidget` test to validate active widgets
 - **File**: `src/test_ui.js:25-31`
 
+### Fix #4: Structural Cleanup (2026-01-21)
+- Removed commented-out `ClaudeUsage` widget initialization from `_renderer.js:555`
+- Retained `ContextWidget` comment as placeholder for future implementation
+- Verified no orphaned class files (all 23 classes are properly referenced)
+- Audited asset paths - no problematic hardcoded paths found
+- **File**: `src/_renderer.js`
+
 ### Fix #2: CI/CD Test Suite Created
 - Added Jest configuration (`jest.config.js`)
 - Created unit tests for `AgentList` and `TodoWidget` classes

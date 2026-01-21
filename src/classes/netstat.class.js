@@ -168,7 +168,8 @@ class Netstat {
                 offline = true;
             } else {
                 if (this.runsBeforeGeoIPUpdate === 0 && this.lastconn.finished) {
-                    this.lastconn = require("https").get({ host: "myexternalip.com", port: 443, path: "/json", localAddress: net.ip4, agent: this._httpsAgent }, res => {
+                    const externalIpService = window.settings.externalIpService || { host: "myexternalip.com", port: 443, path: "/json" };
+                    this.lastconn = require("https").get({ host: externalIpService.host, port: externalIpService.port, path: externalIpService.path, localAddress: net.ip4, agent: this._httpsAgent }, res => {
                         let rawData = "";
                         res.on("data", chunk => {
                             rawData += chunk;
@@ -199,7 +200,7 @@ class Netstat {
                                 console.warn(e);
                                 console.info(rawData.toString());
                                 let electron = require("electron");
-                                electron.ipcRenderer.send("log", "note", "NetStat: Error parsing data from myexternalip.com");
+                                electron.ipcRenderer.send("log", "note", "NetStat: Error parsing data from external IP service");
                                 electron.ipcRenderer.send("log", "debug", `Error: ${e}`);
                             }
                         });

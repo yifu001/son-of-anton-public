@@ -16,7 +16,7 @@ class UpdateChecker {
         https.get({
             protocol: "https:",
             host: "api.github.com",
-            path: "/repos/GitSquared/edex-ui/releases/latest",
+            path: "/repos/yifu001/son-of-anton/releases/latest",
             headers: {
                 "User-Agent": "Son of Anton UpdateChecker"
             }

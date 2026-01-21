@@ -468,4 +468,5 @@ Store per-terminal:
 ### Low Confidence (Community/WebSearch)
 - [ClaudeLog - Agent Engineering](https://claudelog.com/mechanics/agent-engineering/)
 - [Anthropic - Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)
-- [eDEX-UI GitHub](https://github.com/GitSquared/edex-ui)
+- [eDEX-UI GitHub (original)](https://github.com/GitSquared/edex-ui)
+- [Son of Anton GitHub](https://github.com/yifu001/son-of-anton)

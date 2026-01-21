@@ -1,6 +1,7 @@
 class DocReader {
     constructor(opts) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = './node_modules/pdfjs-dist/build/pdf.worker.js';
+        // Use require.resolve for correct path in both dev and packaged builds
+        pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/build/pdf.worker.js');
         const modalElementId = "modal_" + opts.modalId;
         const path = opts.path;
         const scale = 1;

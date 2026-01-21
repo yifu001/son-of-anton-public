@@ -86,7 +86,8 @@ class ClaudeUsage {
     }
 
     async getUsageFromApi(apiKey) {
-        const baseUrl = "https://api.anthropic.com/v1/organizations/usage_report/claude_code";
+        // Configurable API endpoint with sensible default
+        const baseUrl = window.settings.claudeApiUsageUrl || "https://api.anthropic.com/v1/organizations/usage_report/claude_code";
         const fetchOptions = {
             method: "GET",
             headers: {
