@@ -120,7 +120,7 @@ class ClaudeStateManager {
                 this._handleLiveContextChange(this.liveContextPath);
             }
         } catch (error) {
-            // Ignore polling errors
+            console.warn("[ClaudeState] Live context poll failed:", error.message);
         }
     }
 
@@ -286,11 +286,11 @@ class ClaudeStateManager {
                                 this._scanSubagentsDir(sessionSubagents, agents, oneDayAgo, subdir);
                             }
                         } catch (e) {
-                            // Ignore errors for individual subdirs
+                            console.warn("[ClaudeState] Error scanning subdir:", subdirPath, e.message);
                         }
                     }
                 } catch (e) {
-                    // Ignore errors for individual projects
+                    console.warn("[ClaudeState] Error scanning project:", project, e.message);
                 }
             }
 
@@ -363,7 +363,7 @@ class ClaudeStateManager {
                             }
                         }
                     } catch (e) {
-                        // Ignore parse errors, use defaults
+                        console.warn("[ClaudeState] Error parsing agent file:", filepath, e.message);
                     }
 
                     const status = this._getAgentStatus(agentSessionId, agentId, mtime);
@@ -377,11 +377,11 @@ class ClaudeStateManager {
                         sessionId: agentSessionId
                     });
                 } catch (e) {
-                    // Ignore errors for individual files
+                    console.warn("[ClaudeState] Error processing agent file:", file, e.message);
                 }
             }
         } catch (error) {
-            // Ignore errors reading directory
+            console.warn("[ClaudeState] Error reading subagents directory:", subagentsDir, error.message);
         }
     }
 
@@ -414,7 +414,7 @@ class ClaudeStateManager {
                     }
                 }
             } catch (e) {
-                // Fall through to mtime heuristic
+                console.warn("[ClaudeState] Error reading todo file for agent status:", todoPath, e.message);
             }
         }
 
