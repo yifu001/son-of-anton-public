@@ -344,6 +344,18 @@ class Terminal {
                 return null;
             };
 
+            // Debug logging wrapper for CWD parsing
+            this._debugLogCwdParse = (data, result) => {
+                if (typeof window !== 'undefined' && window.settings && window.settings.debug) {
+                    // Only log first 200 chars to avoid flooding console
+                    const preview = data.length > 200 ? data.substring(0, 200) + '...' : data;
+                    console.log("[Terminal] Parsing CWD from output:", preview.replace(/\r?\n/g, '\\n'));
+                    if (result) {
+                        console.log("[Terminal] Matched CWD:", result);
+                    }
+                }
+            };
+
             this._getTtyCWD = tty => {
                 return new Promise((resolve, reject) => {
                     let pid = tty._pid;
@@ -508,6 +520,8 @@ class Terminal {
                     // Windows: Parse CWD from prompt output
                     if (require("os").type() === "Windows_NT") {
                         const parsed = this._parseWindowsCwdFromOutput(data);
+                        // Log parsing attempts for debugging
+                        this._debugLogCwdParse(data, parsed);
                         if (parsed && parsed !== this._windowsCwdFromPrompt) {
                             this._windowsCwdFromPrompt = parsed;
                             this.tty._cwd = parsed;
