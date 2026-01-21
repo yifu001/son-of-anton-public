@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude config list:*)",
+      "Bash(ls:*)",
+      "Bash(claude mcp list:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(python:*)",
+      "Bash(node:*)",
+      "Bash(head:*)",
+      "Bash(npm install:*)",
+      "Bash(npm test)",
+      "Bash(dir:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

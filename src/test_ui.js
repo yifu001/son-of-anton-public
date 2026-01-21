@@ -22,12 +22,12 @@ window.runUITests = () => {
             check: () => document.getElementById("mod_column_right") !== null
         },
         {
-            name: "Claude Usage Widget Present",
-            check: () => document.getElementById("mod_claudeUsage") !== null
-        },
-        {
             name: "Active Agents Widget Present",
             check: () => document.getElementById("mod_agentList") !== null
+        },
+        {
+            name: "Todo Widget Present",
+            check: () => document.getElementById("mod_todoWidget") !== null
         }
     ];
 
