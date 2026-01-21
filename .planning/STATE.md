@@ -2,13 +2,13 @@
 
 **Project:** Son of Anton
 **Current Phase:** 5.1
-**Status:** Ready to plan
+**Status:** In progress (Plan 01 complete)
 
 ## Project Reference
 
 See: .planning/PROJECT.md
 **Core value:** Real-time visibility and control over Claude Code sessions
-**Current focus:** Phase 5.1 - Quick Fixes & Branding (up next)
+**Current focus:** Phase 5.1 - Quick Fixes & Branding (Plan 01/02 complete)
 
 ## Progress
 
@@ -19,7 +19,7 @@ See: .planning/PROJECT.md
 | 3 | UI Layout Restructure | Complete | 2 |
 | 4 | Claude Code State Infrastructure | Complete | 1 |
 | 5 | Context Tracking Display | ✓ Complete | 3 |
-| 5.1 | Quick Fixes & Branding | Pending | 2 |
+| 5.1 | Quick Fixes & Branding | In Progress (1/2 plans) | 2 |
 | 6 | Agent Visibility | Pending | 4 |
 | 7 | Todo Display | Pending | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
@@ -31,8 +31,8 @@ See: .planning/PROJECT.md
 ## Current Position
 
 - **Phase:** 5.1 - Quick Fixes & Branding
-- **Plan:** Not yet created
-- **Status:** Ready to plan
+- **Plan:** 01 of 2 complete
+- **Status:** Plan 01 executed, Plan 02 (branding) pending
 
 ## Performance Metrics
 
@@ -40,7 +40,7 @@ See: .planning/PROJECT.md
 |--------|-------|
 | Phases completed | 5 |
 | Requirements delivered | 12/27 |
-| Plans executed | 7 |
+| Plans executed | 8 |
 
 ## Accumulated Context
 
@@ -65,6 +65,8 @@ See: .planning/PROJECT.md
 - Max context: 200k tokens (Claude's standard limit)
 - Staleness threshold: 30 seconds before dimming widget
 - Default warning threshold: 80% (configurable via settings)
+- GeoLookup null handling: Show "IP: x.x.x.x (GEO N/A)" when geo unavailable
+- Debug logging: Use `[ModuleName]` prefix pattern, gated by window.settings.debug
 
 ### Technical Notes
 - Node 16.x required (Electron 12 ABI compatibility)
@@ -155,11 +157,25 @@ See: .planning/PROJECT.md
 **Verification:** Passed (6/6 must-haves)
 **Report:** .planning/phases/05-context-tracking-display/05-VERIFICATION.md
 
+## Phase 5.1 Progress
+
+**Started:** 2026-01-21
+**Plans:** 1/2 complete
+
+### Plan 01: Bug Investigation & Debug Logging
+**Completed:** 2026-01-21
+**Commits:**
+- `059ae97` fix(05.1-01): add geoLookup null safety and debug logging
+- `9eff403` fix(05.1-01): add debug logging for HTTP errors in external IP fetch
+- `df16b84` fix(05.1-01): add debug logging for Windows CWD tracking
+
+**Summary:** .planning/phases/05.1-quick-fixes-branding/05.1-01-SUMMARY.md
+
 ## Session Continuity
 
-**Last session:** Added Phase 5.1 from pending todos
-**Next action:** `/gsd:discuss-phase 5.1` or `/gsd:plan-phase 5.1`
+**Last session:** 2026-01-21 - Completed 05.1-01-PLAN.md
+**Next action:** Execute Plan 02 (branding/logo update) or verify Phase 5.1
 
 ---
 *State initialized: 2026-01-20*
-*Last updated: 2026-01-20*
+*Last updated: 2026-01-21*
