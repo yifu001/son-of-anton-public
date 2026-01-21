@@ -16,7 +16,17 @@ class AgentList {
         this._onStateChange = this._onStateChange.bind(this);
         window.addEventListener('claude-state-changed', this._onStateChange);
 
+        // Event delegation for expand/collapse (added ONCE, not on every render)
+        this.contentEl.addEventListener('click', (e) => {
+            const item = e.target.closest('.agent-item');
+            if (item) this._toggleExpand(item);
+        });
+
         this.init();
+    }
+
+    destroy() {
+        window.removeEventListener('claude-state-changed', this._onStateChange);
     }
 
     init() {
@@ -28,42 +38,104 @@ class AgentList {
 
     _onStateChange(event) {
         const state = event.detail;
-        if (!state || !state.agents) return;
+        if (!state) {
+            console.warn('AgentList: Received null/undefined state');
+            return;
+        }
+        if (!state.agents) {
+            console.warn('AgentList: State missing agents array');
+            return;
+        }
+
+        // Get current session ID from live context
+        const currentSessionId = this._extractSessionId(state);
 
         // Filter and sort agents
-        const agents = this._processAgents(state.agents);
+        const agents = this._processAgents(state.agents, currentSessionId);
         this.render(agents);
     }
 
-    _processAgents(agents) {
+    _extractSessionId(state) {
+        if (!state.liveContext) {
+            console.debug('AgentList: liveContext not available');
+            return null;
+        }
+        if (!state.liveContext.session_id) {
+            console.debug('AgentList: liveContext.session_id missing');
+            return null;
+        }
+        return String(state.liveContext.session_id).trim();
+    }
+
+    _processAgents(agents, currentSessionId) {
         const TEN_MINUTES_MS = 10 * 60 * 1000;
+        const FIVE_MINUTES_MS = 5 * 60 * 1000;
         const now = Date.now();
 
-        // Process agents: assign display status
-        // - RUNNING stays RUNNING (active)
-        // - PENDING stays PENDING
-        // - Others with mtime within 10 min become ONLINE
-        const processed = agents.map(a => {
-            let displayStatus = a.status;
-            if (a.status !== 'RUNNING' && a.status !== 'PENDING') {
-                const age = now - a.mtime;
-                if (age <= TEN_MINUTES_MS) {
-                    displayStatus = 'ONLINE';
+        // Validate and process agents
+        const processed = agents
+            .filter(a => {
+                // Validate required properties
+                if (!a || !a.id) {
+                    console.warn('AgentList: Invalid agent (missing id)', a);
+                    return false;
                 }
+                if (typeof a.mtime !== 'number' || isNaN(a.mtime)) {
+                    console.warn('AgentList: Invalid agent mtime', { id: a.id, mtime: a.mtime });
+                    return false;
+                }
+                return true;
+            })
+            .map(a => {
+                // Normalize sessionId for comparison
+                const agentSessionId = a.sessionId ? String(a.sessionId).trim() : null;
+                const isCurrentSession = currentSessionId && agentSessionId === currentSessionId;
+                const age = now - a.mtime;
+                const isRecent = age <= TEN_MINUTES_MS;
+                const isVeryRecent = age <= FIVE_MINUTES_MS;
+
+                // Normalize status to uppercase
+                const status = (a.status || 'UNKNOWN').toUpperCase();
+                let displayStatus = status;
+
+                // For non-running/pending agents in current session, mark as ONLINE if recent
+                if (status !== 'RUNNING' && status !== 'PENDING') {
+                    if (isCurrentSession && isRecent) {
+                        displayStatus = 'ONLINE';
+                    }
+                }
+                return { ...a, status, displayStatus, isCurrentSession, isRecent, isVeryRecent };
+            });
+
+        // Filter agents based on session context availability
+        const filtered = processed.filter(a => {
+            if (a.displayStatus === 'RUNNING' || a.displayStatus === 'PENDING') {
+                // CRITICAL FIX: When no session ID available, use stricter filtering
+                if (!currentSessionId) {
+                    // Without session context, only show very recent agents (5 min)
+                    return a.isVeryRecent;
+                }
+                // With session context: current session OR recent
+                return a.isCurrentSession || a.isRecent;
             }
-            return { ...a, displayStatus };
+            // ONLINE only for current session
+            return a.isCurrentSession && a.displayStatus === 'ONLINE';
         });
 
-        // Filter: show RUNNING, PENDING, or ONLINE
-        const relevantStatuses = new Set(['RUNNING', 'PENDING', 'ONLINE']);
-        const filtered = processed.filter(a => relevantStatuses.has(a.displayStatus));
-
-        // Sort by status priority: RUNNING (active) first, then PENDING, then ONLINE
+        // Sort: current session first, then by status priority, then by recency
         const statusPriority = { 'RUNNING': 0, 'PENDING': 1, 'ONLINE': 2 };
         filtered.sort((a, b) => {
+            // Current session agents always come first
+            if (a.isCurrentSession !== b.isCurrentSession) {
+                return a.isCurrentSession ? -1 : 1;
+            }
+            // Then by status priority
             const priorityDiff = (statusPriority[a.displayStatus] || 99) - (statusPriority[b.displayStatus] || 99);
             if (priorityDiff !== 0) return priorityDiff;
-            return b.mtime - a.mtime;
+            // Then by recency (handle potential NaN)
+            const mtimeA = a.mtime || 0;
+            const mtimeB = b.mtime || 0;
+            return mtimeB - mtimeA;
         });
 
         // Limit to 5 visible
@@ -72,7 +144,6 @@ class AgentList {
 
     _generateAgentName(task) {
         // Extract meaningful name from task description
-        // Note: slug is session-scoped, not agent-specific, so we don't use it
         if (!task || task === 'Unknown task') return 'Agent Task';
 
         // Strip XML-like tags (e.g., <objective>, <planning_context>)
@@ -125,6 +196,9 @@ class AgentList {
             }
         }
 
+        // Trim and validate
+        name = (name || '').trim();
+
         // Max 30 chars with ellipsis
         if (name && name.length > 30) {
             return name.slice(0, 27) + '...';
@@ -174,12 +248,13 @@ class AgentList {
         let html = '';
         agents.forEach((agent, index) => {
             const name = this._generateAgentName(agent.task);
-            const statusClass = (agent.displayStatus || agent.status).toLowerCase();
+            const statusClass = (agent.displayStatus || agent.status || 'unknown').toLowerCase();
             const taskPreview = this._truncateTask(agent.task, 60);
             const fullTask = this._escapeHtml(agent.task || 'No task description');
+            const agentId = agent.id || `unknown-${index}`;
 
             html += `
-                <div class="agent-item ${statusClass}" data-agent-id="${agent.id}" data-expanded="false">
+                <div class="agent-item ${statusClass}" data-agent-id="${agentId}" data-expanded="false">
                     <div class="agent-line1">
                         <span class="agent-status-dot ${statusClass}"></span>
                         <span class="agent-name">${this._escapeHtml(name)}</span>
@@ -195,11 +270,7 @@ class AgentList {
         });
 
         this.contentEl.innerHTML = html;
-
-        // Add click handlers for expand/collapse
-        this.contentEl.querySelectorAll('.agent-item').forEach(item => {
-            item.addEventListener('click', () => this._toggleExpand(item));
-        });
+        // Note: Click handlers use event delegation (set up once in constructor)
     }
 }
 
