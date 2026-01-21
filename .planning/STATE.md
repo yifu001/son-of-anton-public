@@ -2,13 +2,13 @@
 
 **Project:** Son of Anton
 **Current Phase:** 5.1
-**Status:** In progress (Plan 01 complete)
+**Status:** Complete
 
 ## Project Reference
 
 See: .planning/PROJECT.md
 **Core value:** Real-time visibility and control over Claude Code sessions
-**Current focus:** Phase 5.1 - Quick Fixes & Branding (Plan 01/02 complete)
+**Current focus:** Phase 5.1 - Quick Fixes & Branding (complete, ready for Phase 6)
 
 ## Progress
 
@@ -18,29 +18,29 @@ See: .planning/PROJECT.md
 | 2 | Terminal Management | Complete | 3 |
 | 3 | UI Layout Restructure | Complete | 2 |
 | 4 | Claude Code State Infrastructure | Complete | 1 |
-| 5 | Context Tracking Display | ✓ Complete | 3 |
-| 5.1 | Quick Fixes & Branding | In Progress (1/2 plans) | 2 |
+| 5 | Context Tracking Display | Complete | 3 |
+| 5.1 | Quick Fixes & Branding | Complete (2/2 plans) | 2 |
 | 6 | Agent Visibility | Pending | 4 |
 | 7 | Todo Display | Pending | 3 |
 | 8 | Tools/MCP Display | Pending | 3 |
 | 9 | Voice Foundation | Pending | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Progress:** [█████.....] 5/11 phases complete
+**Progress:** [██████....] 6/11 phases complete
 
 ## Current Position
 
 - **Phase:** 5.1 - Quick Fixes & Branding
-- **Plan:** 01 of 2 complete
-- **Status:** Plan 01 executed, Plan 02 (branding) pending
+- **Plan:** 02 of 2 complete
+- **Status:** Phase 5.1 complete, ready for Phase 6
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Phases completed | 5 |
-| Requirements delivered | 12/27 |
-| Plans executed | 8 |
+| Phases completed | 6 |
+| Requirements delivered | 14/27 |
+| Plans executed | 9 |
 
 ## Accumulated Context
 
@@ -67,6 +67,8 @@ See: .planning/PROJECT.md
 - Default warning threshold: 80% (configurable via settings)
 - GeoLookup null handling: Show "IP: x.x.x.x (GEO N/A)" when geo unavailable
 - Debug logging: Use `[ModuleName]` prefix pattern, gated by window.settings.debug
+- Icon generation: png2icons for ICO/ICNS, jimp for PNG resize (Node 16 compatible)
+- BMP mode for ICO: better Windows executable compatibility
 
 ### Technical Notes
 - Node 16.x required (Electron 12 ABI compatibility)
@@ -85,12 +87,13 @@ See: .planning/PROJECT.md
 - Custom event: claude-state-changed for widget subscription
 - Widget state subscription: addEventListener('claude-state-changed', handler)
 - Session lookup: window.terminalSessions[currentTerm] for active session ID
+- Icon regeneration: node scripts/generate-icons.js from media/logo.png
 
 ### Blockers
 - (none)
 
 ### Pending Todos
-(none - converted to Phase 5.1)
+(none)
 
 ## Phase 1 Completion
 
@@ -157,10 +160,10 @@ See: .planning/PROJECT.md
 **Verification:** Passed (6/6 must-haves)
 **Report:** .planning/phases/05-context-tracking-display/05-VERIFICATION.md
 
-## Phase 5.1 Progress
+## Phase 5.1 Completion
 
-**Started:** 2026-01-21
-**Plans:** 1/2 complete
+**Completed:** 2026-01-21
+**Plans:** 2/2
 
 ### Plan 01: Bug Investigation & Debug Logging
 **Completed:** 2026-01-21
@@ -171,10 +174,18 @@ See: .planning/PROJECT.md
 
 **Summary:** .planning/phases/05.1-quick-fixes-branding/05.1-01-SUMMARY.md
 
+### Plan 02: App Branding Update
+**Completed:** 2026-01-21
+**Commits:**
+- `a3af1a0` chore(05.1-02): install png2icons for icon generation
+- `792f1ab` feat(05.1-02): generate all icon formats from new logo
+
+**Summary:** .planning/phases/05.1-quick-fixes-branding/05.1-02-SUMMARY.md
+
 ## Session Continuity
 
-**Last session:** 2026-01-21 - Completed 05.1-01-PLAN.md
-**Next action:** Execute Plan 02 (branding/logo update) or verify Phase 5.1
+**Last session:** 2026-01-21 - Completed 05.1-02-PLAN.md (App Branding)
+**Next action:** Verify Phase 5.1 or proceed to Phase 6 (Agent Visibility)
 
 ---
 *State initialized: 2026-01-20*
