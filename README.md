@@ -1,104 +1,159 @@
 <p align="center">
   <br>
-  <img alt="Logo" src="media/logo.png">
+  <img alt="Logo" src="media/logo.png" width="400">
   <br><br>
   <a href="https://github.com/yifu001/son-of-anton/releases/latest"><img alt="Release" src="https://img.shields.io/github/release/yifu001/son-of-anton.svg?style=popout"></a>
   <a href="https://github.com/yifu001/son-of-anton/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/yifu001/son-of-anton.svg?style=popout"></a>
-  <br><br>
 </p>
 
-**Son of Anton** is a fullscreen, cross-platform terminal emulator and system monitor that looks and feels like a sci-fi computer interface. It extends the original [eDEX-UI](https://github.com/GitSquared/edex-ui) with Claude Code integration for AI-assisted development.
+# Son of Anton
 
-> Fork of [eDEX-UI v2.2.8](https://github.com/GitSquared/edex-ui) (archived Oct. 2021)
+A sci-fi terminal emulator and Claude Code command center. Monitor your AI coding sessions in a TRON-inspired interface.
+
+> Fork of [eDEX-UI v2.2.8](https://github.com/GitSquared/edex-ui)
+
+![Screenshot](media/screenshot.png)
 
 ---
 
-## New Features (Son of Anton)
+## Features
 
-- **Claude Code Integration** - Real-time visibility into Claude Code sessions
-- **Agent List Widget** - Monitor active Claude subagents
-- **Todo Widget** - Track tasks from Claude Code sessions
-- **Context Tracking** - Display current Claude context and token usage
+### Claude Code Integration
 
-## Original eDEX-UI Features
+Run Claude Code inside Son of Anton and get real-time visibility into your AI coding sessions:
 
-- Fully featured terminal emulator with tabs, colors, mouse events, and support for `curses` applications
-- Real-time system (CPU, RAM, swap, processes) and network (GeoIP, active connections) monitoring
-- Full support for touch-enabled displays, including an on-screen keyboard
-- Directory viewer that follows the CWD of the terminal
-- Advanced customization using themes, keyboard layouts, CSS injections
-- Optional sound effects for maximum sci-fi hacking vibe
+- **Context Tracking** - Live display of token usage and context consumption
+- **Active Agents Panel** - Monitor spawned subagents, their status, and descriptions
+- **Todo Widget** - View tasks Claude is tracking during the session
+- **Session State** - See current working directory, conversation state, and activity
 
-Heavily inspired by the [TRON Legacy movie effects](https://web.archive.org/web/20170511000410/http://jtnimoy.com/blogs/projects/14881671).
+The integration works automatically by parsing Claude Code's terminal output - no API keys or configuration required.
 
-## Screenshots
+### Terminal Emulator
 
-![Default screenshot](media/screenshot_default.png)
+- Multi-tab terminal with full color and mouse support
+- Works with bash, zsh, PowerShell, cmd, and curses applications
+- Sci-fi sound effects for typing, commands, and events
+- Directory browser that follows terminal's current working directory
 
-_[neofetch](https://github.com/dylanaraps/neofetch) on eDEX-UI with the default "tron" theme_
+### System Monitoring
 
-## Installation
+- **CPU** - Real-time usage graphs and per-core breakdown
+- **RAM** - Memory and swap usage visualization
+- **Network** - Active connections, bandwidth, and GeoIP location globe
+- **Processes** - Top processes by CPU/memory usage
 
-### From Releases
-Download the latest release for your platform from the [Releases](https://github.com/yifu001/son-of-anton/releases) page.
+### Customization
 
-### From Source
+- 10 built-in themes (Tron, Blade, Matrix, Nord, etc.)
+- On-screen keyboard for touch displays
+- Configurable keyboard layouts
+- CSS injection for advanced styling
 
-**Linux/macOS:**
-```bash
-git clone https://github.com/yifu001/son-of-anton.git
-cd son-of-anton
-npm run install-linux
-npm run start
+---
+
+## Quick Start
+
+### 1. Download
+
+Download the latest installer for your platform from [Releases](https://github.com/yifu001/son-of-anton/releases):
+
+| Platform | File |
+|----------|------|
+| Windows (64-bit) | `Son of Anton-Windows-x64.exe` |
+| Windows (32-bit) | `Son of Anton-Windows-ia32.exe` |
+| macOS | `Son of Anton-macOS.dmg` |
+| Linux | `Son of Anton-Linux.AppImage` |
+
+### 2. Install & Run
+
+**Windows:**
+1. Run the `.exe` installer
+2. Launch "Son of Anton" from Start Menu or Desktop
+
+**macOS:**
+1. Open the `.dmg` file
+2. Drag to Applications folder
+3. Launch from Applications
+
+**Linux:**
+1. Make AppImage executable: `chmod +x Son-of-Anton-*.AppImage`
+2. Run: `./Son-of-Anton-*.AppImage`
+
+### 3. Use with Claude Code
+
+1. Open Son of Anton
+2. In the terminal, run `claude` to start Claude Code
+3. The side panels will automatically display Claude's context, agents, and todos
+
+---
+
+## Configuration
+
+Configuration files are stored in:
+- **Windows:** `%APPDATA%\Son of Anton\`
+- **macOS:** `~/Library/Application Support/Son of Anton/`
+- **Linux:** `~/.config/Son of Anton/`
+
+### Themes
+
+Change themes from the settings panel or edit `settings.json`:
+
+```json
+{
+  "theme": "tron"
+}
 ```
 
-**Windows (run as Administrator):**
-```powershell
-git clone https://github.com/yifu001/son-of-anton.git
-cd son-of-anton
-npm run install-windows
-npm run start
+Available themes: `tron`, `blade`, `matrix`, `nord`, `navy`, `red`, `apollo`, `cyborg`, `interstellar`, `chalkboard`
+
+---
+
+## Keyboard Shortcuts
+
+| Action | Shortcut |
+|--------|----------|
+| Toggle Fullscreen | `F11` |
+| New Terminal Tab | `Ctrl+Shift+T` |
+| Close Tab | `Ctrl+Shift+W` |
+| Next Tab | `Ctrl+Tab` |
+| Copy | `Ctrl+Shift+C` |
+| Paste | `Ctrl+Shift+V` |
+
+---
+
+## Troubleshooting
+
+### App won't start
+- Ensure you have the correct version for your OS architecture
+- Try running as Administrator (Windows) or with sudo (Linux)
+
+### Terminal shows wrong shell
+Edit `settings.json` and set your preferred shell:
+```json
+{
+  "shell": "powershell.exe"
+}
 ```
 
-### Building
+### File browser shows "Tracking Failed" (Windows)
+This is expected. Windows doesn't support terminal CWD tracking. The file browser works in "detached" mode.
 
-Note: Due to native modules, you can only build targets for the host OS.
+### Display issues on HiDPI screens
+Launch with `--force-device-scale-factor=1` flag.
 
-```bash
-npm install
-npm run build-linux   # or build-windows or build-darwin
-```
-
-## Q&A
-
-#### I have a problem!
-Search through the [Issues](https://github.com/yifu001/son-of-anton/issues) to see if yours has been reported. If not, feel free to open a new one.
-
-#### Can you disable the keyboard/filesystem display?
-You can hide them using the `tron-notype` theme.
-
-#### Why is the file browser saying "Tracking Failed"? (Windows)
-On Windows, terminal CWD tracking is not supported. The file browser uses "detached" mode instead.
-
-#### Can this run on a Raspberry Pi / ARM device?
-ARM64 builds are provided. For other platforms, build from source.
+---
 
 ## Credits
 
-### Son of Anton
-- Fork maintained by [yifu001](https://github.com/yifu001)
+- **Son of Anton** - Fork by [yifu001](https://github.com/yifu001)
+- **Original eDEX-UI** - Created by [Squared](https://github.com/GitSquared)
+- **Sound Effects** - [IceWolf](https://soundcloud.com/iamicewolf)
 
-### Original eDEX-UI
-- Created by [Squared](https://github.com/GitSquared) - [website](https://gaby.dev)
-- [PixelyIon](https://github.com/PixelyIon) - Windows compatibility
-- [IceWolf](https://soundcloud.com/iamicewolf) - Sound effects (v2.1.x+)
+Inspired by [TRON Legacy](https://web.archive.org/web/20170511000410/http://jtnimoy.com/blogs/projects/14881671) movie effects.
 
-### Dependencies
-- [xterm.js](https://github.com/xtermjs/xterm.js)
-- [systeminformation](https://github.com/sebhildebrandt/systeminformation)
-- [SmoothieCharts](https://github.com/joewalnes/smoothie)
-- [ENCOM Globe](https://github.com/arscan/encom-globe) by Rob Scanlon
+---
 
 ## License
 
-Licensed under the [GPLv3.0](https://github.com/yifu001/son-of-anton/blob/master/LICENSE).
+[GPLv3.0](LICENSE)
