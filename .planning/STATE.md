@@ -23,24 +23,24 @@ See: .planning/PROJECT.md
 | 6 | Agent Visibility | Complete (2/2 plans) | 4 |
 | 7 | Todo Display | Complete (1/1 plans) | 3 |
 | 8 | Silent Failures Fix | Complete (1/1 plans) | 3 |
-| 9 | Voice Foundation | In Progress (1/2 plans) | 3 |
+| 9 | Voice Foundation | Complete (2/2 plans) | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
-**Progress:** [█████████.] 9/11 phases complete
+**Progress:** [██████████] 10/11 phases complete
 
 ## Current Position
 
-- **Phase:** 9 - Voice Foundation
-- **Plan:** 1 of 2 complete
-- **Status:** In Progress
+- **Phase:** 10 - Voice Integration
+- **Plan:** 0 of 2 complete
+- **Status:** Pending
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Phases completed | 9 |
-| Requirements delivered | 24/29 |
-| Plans executed | 16 |
+| Phases completed | 10 |
+| Requirements delivered | 27/29 |
+| Plans executed | 17 |
 
 ## Accumulated Context
 
@@ -89,6 +89,12 @@ See: .planning/PROJECT.md
 - Voice in main process: CPU-intensive work offloaded from renderer
 - dotenv for API keys: Load PICOVOICE_ACCESS_KEY and OPENAI_API_KEY from .env file
 - Wake word sensitivity: 0.5 (balanced false positive/negative rate)
+- AudioCapture ScriptProcessor: 512-sample frames at 16kHz for Porcupine
+- VoiceController state machine: DISABLED, IDLE, LISTENING, RECORDING, PROCESSING, ERROR
+- Audio frames to array: IPC serialization requires regular arrays, not Int16Array
+- Voice IPC init: After ClaudeStateManager in did-finish-load handler
+- Max recording: 60 seconds timeout
+- Cancel gesture: Space key cancels listening/recording
 
 ### Technical Notes
 - Node 16.x required (Electron 12 ABI compatibility)
@@ -259,7 +265,10 @@ See: .planning/PROJECT.md
 
 **Summary:** .planning/phases/08.1-silent-failures-fix/08.1-01-SUMMARY.md
 
-## Phase 9 Progress
+## Phase 9 Completion
+
+**Completed:** 2026-01-22
+**Plans:** 2/2
 
 ### Plan 01: Voice Infrastructure Setup
 **Completed:** 2026-01-22
@@ -270,10 +279,19 @@ See: .planning/PROJECT.md
 
 **Summary:** .planning/phases/09-voice-foundation/09-01-SUMMARY.md
 
+### Plan 02: Boot Integration and Audio Capture
+**Completed:** 2026-01-22
+**Commits:**
+- `18a6b45` feat(09-02): integrate voice IPC into boot process
+- `d39b924` feat(09-02): create AudioCapture class for microphone access
+- `a84b07a` feat(09-02): create VoiceController state machine
+
+**Summary:** .planning/phases/09-voice-foundation/09-02-SUMMARY.md
+
 ## Session Continuity
 
-**Last session:** 2026-01-22 - Completed 09-01 (Voice Infrastructure Setup)
-**Next action:** Continue with 09-02 (Boot Integration and Audio Capture)
+**Last session:** 2026-01-22 - Completed 09-02 (Boot Integration and Audio Capture)
+**Next action:** Continue with Phase 10 - Voice Integration
 
 ---
 *State initialized: 2026-01-20*
