@@ -5,7 +5,21 @@
         "b": 55,
         "black": "#000000",
         "light_black": "#090B0A",
-        "grey": "#262827"
+        "grey": "#262827",
+        "red": "#ff5555",
+        "green": "#50fa7b",
+        "yellow": "#f1fa8c",
+        "blue": "#6272a4",
+        "magenta": "#ff79c6",
+        "cyan": "#8be9fd",
+        "white": "#f8f8f2",
+        "brightRed": "#ff6e6e",
+        "brightGreen": "#69ff94",
+        "brightYellow": "#ffffa5",
+        "brightBlue": "#7b93bd",
+        "brightMagenta": "#ff92df",
+        "brightCyan": "#a4ffff",
+        "brightWhite": "#ffffff"
     },
     "cssvars": {
         "font_main": "United Sans Medium",

@@ -3,14 +3,15 @@
  * Runs in Electron main process
  */
 
-const OpenAI = require('openai');
+// const OpenAI = require('openai');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
 class WhisperClient {
   constructor(apiKey) {
-    this.openai = new OpenAI({ apiKey });
+    // this.openai = new OpenAI({ apiKey });
+    console.warn('[Whisper] OpenAI disabled due to Node version incompatibility');
   }
 
   /**
@@ -31,14 +32,15 @@ class WhisperClient {
       fs.writeFileSync(tempPath, audioBuffer);
       console.log('[Whisper] Transcribing audio:', audioBuffer.length, 'bytes');
 
-      const transcription = await this.openai.audio.transcriptions.create({
-        file: fs.createReadStream(tempPath),
-        model: 'whisper-1',
-        language: 'en',
-      });
+      // const transcription = await this.openai.audio.transcriptions.create({
+      //   file: fs.createReadStream(tempPath),
+      //   model: 'whisper-1',
+      //   language: 'en',
+      // });
 
-      console.log('[Whisper] Transcription:', transcription.text);
-      return transcription.text;
+      // console.log('[Whisper] Transcription:', transcription.text);
+      // return transcription.text;
+      return "OpenAI Disabled";
     } catch (error) {
       console.error('[Whisper] Transcription failed:', error.message);
       throw error;

@@ -74,9 +74,9 @@ function setupVoiceIPC(window) {
       if (!accessKey) {
         throw new Error('PICOVOICE_ACCESS_KEY not configured in .env file');
       }
-      if (!openaiKey) {
-        throw new Error('OPENAI_API_KEY not configured in .env file');
-      }
+      // if (!openaiKey) {
+      //   throw new Error('OPENAI_API_KEY not configured in .env file');
+      // }
 
       // Determine model path
       const modelPath = getModelPath();
