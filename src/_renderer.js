@@ -1174,24 +1174,6 @@ window.openSettings = async () => {
                         </select></td>
                     </tr>
                     <tr>
-                        <td colspan="3" style="padding-top: 15px; border-top: 1px solid rgba(var(--color_r), var(--color_g), var(--color_b), 0.3);"><strong>Claude API Configuration</strong></td>
-                    </tr>
-                    <tr>
-                        <td>claudeApiKey</td>
-                        <td>Anthropic Admin API key for usage tracking</td>
-                        <td><input type="password" id="settingsEditor-claudeApiKey" value="${window.settings.claudeApiKey || ''}" placeholder="sk-ant-admin01-..."></td>
-                    </tr>
-                    <tr>
-                        <td>sessionLimitTokens</td>
-                        <td>Session token limit for Claude usage display</td>
-                        <td><input type="number" id="settingsEditor-sessionLimitTokens" value="${window.settings.sessionLimitTokens || 1000000}"></td>
-                    </tr>
-                    <tr>
-                        <td>weeklyLimitTokens</td>
-                        <td>Weekly token limit for Claude usage display</td>
-                        <td><input type="number" id="settingsEditor-weeklyLimitTokens" value="${window.settings.weeklyLimitTokens || 10000000}"></td>
-                    </tr>
-                    <tr>
                         <td>contextWarningThreshold</td>
                         <td>Context usage percentage to trigger warning (0-100)</td>
                         <td><input type="number" id="settingsEditor-contextWarningThreshold" value="${window.settings.contextWarningThreshold || 80}" min="0" max="100"></td>
@@ -1257,9 +1239,6 @@ window.writeSettingsFile = () => {
         fsListView: (document.getElementById("settingsEditor-fsListView").value === "true"),
         experimentalGlobeFeatures: (document.getElementById("settingsEditor-experimentalGlobeFeatures").value === "true"),
         experimentalFeatures: (document.getElementById("settingsEditor-experimentalFeatures").value === "true"),
-        claudeApiKey: document.getElementById("settingsEditor-claudeApiKey").value,
-        sessionLimitTokens: Number(document.getElementById("settingsEditor-sessionLimitTokens").value) || 1000000,
-        weeklyLimitTokens: Number(document.getElementById("settingsEditor-weeklyLimitTokens").value) || 10000000,
         contextWarningThreshold: Number(document.getElementById("settingsEditor-contextWarningThreshold")?.value) || 80
     };
 
