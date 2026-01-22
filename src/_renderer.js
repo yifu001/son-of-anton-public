@@ -78,6 +78,26 @@ window.saveTerminalNames = () => {
 window.terminalSessions = {};  // { terminalIndex: sessionId }
 window.claudeState = null;     // Latest state from main process
 
+// Voice control instances
+window.voiceController = null;
+window.audioFeedback = null;
+window.waveformVisualizer = null;
+window.voiceToggleWidget = null;
+window.interimTranscription = null;
+window.activeTerminal = 0; // Track current terminal for voice integration
+
+// Voice module imports (lazy loaded during initializeVoice)
+let VoiceController, VoiceState, AudioFeedback, WaveformVisualizer, VoiceToggleWidget, InterimTranscription;
+
+// IPC wrapper for voice (maps to electron.ipcRenderer)
+window.ipc = {
+    invoke: (channel, ...args) => ipc.invoke(channel, ...args),
+    send: (channel, ...args) => ipc.send(channel, ...args),
+    on: (channel, callback) => {
+        ipc.on(channel, (event, ...args) => callback(...args));
+    },
+};
+
 window.enableTabRename = (tabIndex) => {
     const tabElement = document.getElementById(`shell_tab${tabIndex}`);
     const textElement = tabElement.querySelector('p');
@@ -327,6 +347,141 @@ function initSystemInformationProxy() {
             };
         }
     });
+}
+
+// Initialize voice system
+async function initializeVoice() {
+    console.log('[Voice] Initializing voice system...');
+
+    try {
+        // Lazy load voice modules
+        const voiceControllerModule = require('./classes/voiceController.class');
+        VoiceController = voiceControllerModule.VoiceController;
+        VoiceState = voiceControllerModule.VoiceState;
+
+        const audioFeedbackModule = require('./classes/audioFeedback.class');
+        AudioFeedback = audioFeedbackModule.AudioFeedback;
+
+        const waveformVisualizerModule = require('./classes/waveformVisualizer.class');
+        WaveformVisualizer = waveformVisualizerModule.WaveformVisualizer;
+
+        const voiceToggleWidgetModule = require('./classes/voiceToggleWidget.class');
+        VoiceToggleWidget = voiceToggleWidgetModule.VoiceToggleWidget;
+
+        const interimTranscriptionModule = require('./classes/interimTranscription.class');
+        InterimTranscription = interimTranscriptionModule.InterimTranscription;
+
+        // Create audio feedback handler
+        window.audioFeedback = new AudioFeedback();
+        window.audioFeedback.initialize();
+
+        // Create waveform visualizer
+        window.waveformVisualizer = new WaveformVisualizer({ barCount: 32 });
+
+        // Create interim transcription (Web Speech API)
+        window.interimTranscription = new InterimTranscription({
+            onInterim: (text) => {
+                // Wire interim results to waveform visualizer
+                if (window.waveformVisualizer) {
+                    window.waveformVisualizer.showInterim(text);
+                }
+            },
+            onError: (error) => {
+                console.warn('[Voice] Interim transcription error:', error);
+            },
+        });
+
+        // Create voice controller with callbacks
+        window.voiceController = new VoiceController({
+            maxRecordingMs: 60000,
+            silenceTimeoutMs: window.settings.voiceSilenceTimeout || 2000,
+
+            onStateChange: (state, oldState) => {
+                console.log('[Voice] State changed:', oldState, '->', state);
+
+                // Update toggle widget
+                if (window.voiceToggleWidget) {
+                    if (state === VoiceState.RECORDING) {
+                        window.voiceToggleWidget.showRecording();
+                    } else if (state === VoiceState.PROCESSING) {
+                        window.voiceToggleWidget.showProcessing();
+                    } else {
+                        window.voiceToggleWidget.resetState();
+                    }
+                }
+
+                // Show/hide waveform and manage interim transcription
+                if (state === VoiceState.RECORDING) {
+                    const activeTerminal = window.currentTerm || 0;
+                    window.waveformVisualizer.show(activeTerminal);
+                    // Start Web Speech API for interim results
+                    if (window.interimTranscription) {
+                        window.interimTranscription.start();
+                    }
+                } else if (oldState === VoiceState.RECORDING) {
+                    window.waveformVisualizer.hide();
+                    // Stop Web Speech API
+                    if (window.interimTranscription) {
+                        window.interimTranscription.stop();
+                    }
+                }
+            },
+
+            onWakeDetected: () => {
+                window.audioFeedback.playYesSir();
+            },
+
+            onTranscription: (text, success) => {
+                if (success && text) {
+                    window.audioFeedback.playSuccess();
+                    insertTranscriptionIntoTerminal(text);
+                } else {
+                    window.audioFeedback.playFailure();
+                }
+            },
+
+            onAudioLevel: (level) => {
+                if (window.waveformVisualizer) {
+                    window.waveformVisualizer.updateLevel(level);
+                }
+            },
+
+            onError: (error) => {
+                console.error('[Voice] Error:', error);
+            },
+        });
+
+        const initialized = await window.voiceController.initialize();
+
+        // Create toggle widget in right column
+        const rightColumn = document.querySelector('#mod_column_right');
+        if (rightColumn) {
+            window.voiceToggleWidget = new VoiceToggleWidget(window.voiceController);
+            window.voiceToggleWidget.create(rightColumn);
+
+            if (!initialized) {
+                window.voiceToggleWidget.showUnavailable();
+            }
+        }
+
+        console.log('[Voice] Voice system initialized:', initialized ? 'SUCCESS' : 'UNAVAILABLE');
+    } catch (error) {
+        console.error('[Voice] Voice system initialization failed:', error.message);
+    }
+}
+
+function insertTranscriptionIntoTerminal(text) {
+    const activeTerminal = window.currentTerm || 0;
+
+    // Try xterm terminal write
+    if (window.term && window.term[activeTerminal] && window.term[activeTerminal].term) {
+        const term = window.term[activeTerminal].term;
+        term.write(text);
+        console.log('[Voice] Wrote transcription to xterm', activeTerminal);
+        return;
+    }
+
+    console.warn('[Voice] Could not find terminal for index', activeTerminal);
 }
 
 // Init audio
@@ -721,6 +876,11 @@ async function initUI() {
     setTimeout(() => {
         if (window.runUITests) window.runUITests();
     }, 2000);
+
+    /* Initialize Voice System */
+    setTimeout(() => {
+        initializeVoice();
+    }, 2500);
 }
 
 window.themeChanger = theme => {
