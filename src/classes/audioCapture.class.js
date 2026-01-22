@@ -1,0 +1,198 @@
+/**
+ * Audio Capture Service
+ * Handles microphone access and audio frame extraction for wake word detection
+ */
+
+class AudioCapture {
+  constructor() {
+    this.audioContext = null;
+    this.mediaStream = null;
+    this.processor = null;
+    this.mediaRecorder = null;
+    this.audioChunks = [];
+    this.isCapturing = false;
+    this.onAudioFrame = null;
+    this.analyser = null;
+    this.dataArray = null;
+  }
+
+  /**
+   * Request microphone permission
+   * @returns {Promise<boolean>} True if permission granted
+   */
+  async requestPermission() {
+    try {
+      this.mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+        },
+      });
+      console.log('[AudioCapture] Microphone permission granted');
+      return true;
+    } catch (error) {
+      console.error('[AudioCapture] Microphone permission denied:', error.message);
+      return false;
+    }
+  }
+
+  /**
+   * Check if microphone is available
+   */
+  hasPermission() {
+    return this.mediaStream !== null;
+  }
+
+  /**
+   * Start capturing audio frames for wake word detection
+   * @param {Function} onFrame - Callback receiving Int16Array frames
+   */
+  startFrameCapture(onFrame) {
+    if (!this.mediaStream) {
+      console.error('[AudioCapture] No media stream available');
+      return false;
+    }
+
+    this.onAudioFrame = onFrame;
+    this.audioContext = new AudioContext({ sampleRate: 16000 });
+    const source = this.audioContext.createMediaStreamSource(this.mediaStream);
+
+    // Process in 512-sample frames for Porcupine
+    this.processor = this.audioContext.createScriptProcessor(512, 1, 1);
+    this.processor.onaudioprocess = (event) => {
+      if (!this.onAudioFrame) return;
+
+      const inputData = event.inputBuffer.getChannelData(0);
+      const frame = this._float32ToInt16(inputData);
+      this.onAudioFrame(frame);
+    };
+
+    source.connect(this.processor);
+    this.processor.connect(this.audioContext.destination);
+    this.isCapturing = true;
+
+    console.log('[AudioCapture] Frame capture started');
+    return true;
+  }
+
+  /**
+   * Convert Float32 audio samples to Int16 for Porcupine
+   * @private
+   */
+  _float32ToInt16(float32Array) {
+    const int16Array = new Int16Array(float32Array.length);
+    for (let i = 0; i < float32Array.length; i++) {
+      const s = Math.max(-1, Math.min(1, float32Array[i]));
+      int16Array[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+    }
+    return int16Array;
+  }
+
+  /**
+   * Get current audio level (0-1) for visualization
+   * @returns {number} RMS audio level
+   */
+  getAudioLevel() {
+    if (!this.analyser || !this.dataArray) return 0;
+    this.analyser.getByteTimeDomainData(this.dataArray);
+    let sum = 0;
+    for (let i = 0; i < this.dataArray.length; i++) {
+      const normalized = (this.dataArray[i] - 128) / 128;
+      sum += normalized * normalized;
+    }
+    return Math.sqrt(sum / this.dataArray.length);
+  }
+
+  /**
+   * Setup analyser for audio visualization
+   */
+  setupAnalyser() {
+    if (!this.audioContext || !this.mediaStream) return;
+
+    this.analyser = this.audioContext.createAnalyser();
+    this.analyser.fftSize = 256;
+    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+
+    const source = this.audioContext.createMediaStreamSource(this.mediaStream);
+    source.connect(this.analyser);
+  }
+
+  /**
+   * Start recording audio for Whisper transcription
+   */
+  startRecording() {
+    if (!this.mediaStream) {
+      console.error('[AudioCapture] No media stream for recording');
+      return false;
+    }
+
+    this.audioChunks = [];
+    this.mediaRecorder = new MediaRecorder(this.mediaStream, {
+      mimeType: 'audio/webm;codecs=opus',
+    });
+
+    this.mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        this.audioChunks.push(event.data);
+      }
+    };
+
+    this.mediaRecorder.start(100); // Collect in 100ms chunks
+    console.log('[AudioCapture] Recording started');
+    return true;
+  }
+
+  /**
+   * Stop recording and get audio blob
+   * @returns {Promise<Blob>} Audio blob in WebM format
+   */
+  stopRecording() {
+    return new Promise((resolve) => {
+      if (!this.mediaRecorder || this.mediaRecorder.state === 'inactive') {
+        resolve(new Blob([]));
+        return;
+      }
+
+      this.mediaRecorder.onstop = () => {
+        const blob = new Blob(this.audioChunks, { type: 'audio/webm' });
+        console.log('[AudioCapture] Recording stopped:', blob.size, 'bytes');
+        resolve(blob);
+      };
+
+      this.mediaRecorder.stop();
+    });
+  }
+
+  /**
+   * Stop frame capture
+   */
+  stopFrameCapture() {
+    if (this.processor) {
+      this.processor.disconnect();
+      this.processor = null;
+    }
+    if (this.audioContext) {
+      this.audioContext.close();
+      this.audioContext = null;
+    }
+    this.onAudioFrame = null;
+    this.isCapturing = false;
+    console.log('[AudioCapture] Frame capture stopped');
+  }
+
+  /**
+   * Release all resources
+   */
+  release() {
+    this.stopFrameCapture();
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach(track => track.stop());
+      this.mediaStream = null;
+    }
+    console.log('[AudioCapture] Released');
+  }
+}
+
+module.exports = { AudioCapture };
