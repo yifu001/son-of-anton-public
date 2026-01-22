@@ -17,6 +17,10 @@ process.on("uncaughtException", e => {
     process.exit(1);
 });
 
+app.on('will-quit', () => {
+    cleanupVoiceIPC();
+});
+
 signale.start(`Starting Son of Anton v${app.getVersion()}`);
 signale.info(`With Node ${process.versions.node} and Electron ${process.versions.electron}`);
 signale.info(`Renderer is Chrome ${process.versions.chrome}`);
@@ -38,6 +42,7 @@ const fs = require("fs");
 const which = require("which");
 const Terminal = require("./classes/terminal.class.js").Terminal;
 const ClaudeStateManager = require("./classes/claudeState.class.js");
+const { setupVoiceIPC, cleanupVoiceIPC } = require('./main/ipc/voiceHandlers');
 
 ipc.on("log", (e, type, content) => {
     signale[type](content);
@@ -224,6 +229,10 @@ function createWindow(settings) {
         claudeStateManager = new ClaudeStateManager(win);
         claudeStateManager.start();
         signale.success("Claude state manager initialized");
+
+        // Initialize voice IPC handlers
+        setupVoiceIPC(win);
+        signale.success("Voice IPC handlers initialized");
     });
 
     signale.watch("Waiting for frontend connection...");
