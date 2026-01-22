@@ -41,9 +41,25 @@ function getModelPath() {
  * @param {BrowserWindow} window - Main Electron window
  */
 function setupVoiceIPC(window) {
+  // Clean up voice services (but not handlers - we do that inline below)
+  if (wakeWordDetector) {
+    try {
+      wakeWordDetector.release();
+    } catch (e) {
+      console.warn('[VoiceIPC] Error releasing wake word detector:', e.message);
+    }
+    wakeWordDetector = null;
+  }
+  whisperClient = null;
+
+  // Remove listeners (these can have multiple listeners, so removeAll is correct)
+  ipcMain.removeAllListeners('voice:audio-frame');
+  ipcMain.removeAllListeners('voice:release');
+
   mainWindow = window;
 
-  // Check voice availability
+  // Remove then register each handler atomically to prevent race conditions
+  ipcMain.removeHandler('voice:check-availability');
   ipcMain.handle('voice:check-availability', () => {
     const accessKey = process.env.PICOVOICE_ACCESS_KEY;
     const openaiKey = process.env.OPENAI_API_KEY;
@@ -66,6 +82,7 @@ function setupVoiceIPC(window) {
   });
 
   // Initialize voice services
+  ipcMain.removeHandler('voice:initialize');
   ipcMain.handle('voice:initialize', async () => {
     try {
       const accessKey = process.env.PICOVOICE_ACCESS_KEY;
@@ -119,6 +136,7 @@ function setupVoiceIPC(window) {
   });
 
   // Transcribe audio with Whisper
+  ipcMain.removeHandler('voice:transcribe');
   ipcMain.handle('voice:transcribe', async (event, audioData) => {
     if (!whisperClient) {
       return { success: false, error: 'Whisper client not initialized' };
@@ -150,14 +168,27 @@ function setupVoiceIPC(window) {
 }
 
 /**
- * Cleanup voice IPC handlers
+ * Cleanup voice IPC handlers (called on app quit)
  */
 function cleanupVoiceIPC() {
+  // Remove handlers first to prevent any new calls
+  ipcMain.removeHandler('voice:check-availability');
+  ipcMain.removeHandler('voice:initialize');
+  ipcMain.removeHandler('voice:transcribe');
+  ipcMain.removeAllListeners('voice:audio-frame');
+  ipcMain.removeAllListeners('voice:release');
+
+  // Then clean up voice services
   if (wakeWordDetector) {
-    wakeWordDetector.release();
+    try {
+      wakeWordDetector.release();
+    } catch (e) {
+      console.warn('[VoiceIPC] Error releasing wake word detector:', e.message);
+    }
     wakeWordDetector = null;
   }
   whisperClient = null;
+  mainWindow = null;
 }
 
 module.exports = { setupVoiceIPC, cleanupVoiceIPC };
