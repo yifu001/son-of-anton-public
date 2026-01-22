@@ -1,14 +1,14 @@
 # Project State
 
 **Project:** Son of Anton
-**Current Phase:** 8
-**Status:** Complete
+**Current Phase:** 9
+**Status:** In Progress
 
 ## Project Reference
 
 See: .planning/PROJECT.md
 **Core value:** Real-time visibility and control over Claude Code sessions
-**Current focus:** Phase 8 - Silent Failures Fix
+**Current focus:** Phase 9 - Voice Foundation
 
 ## Progress
 
@@ -23,16 +23,16 @@ See: .planning/PROJECT.md
 | 6 | Agent Visibility | Complete (2/2 plans) | 4 |
 | 7 | Todo Display | Complete (1/1 plans) | 3 |
 | 8 | Silent Failures Fix | Complete (1/1 plans) | 3 |
-| 9 | Voice Foundation | Pending | 3 |
+| 9 | Voice Foundation | In Progress (1/2 plans) | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
 **Progress:** [█████████.] 9/11 phases complete
 
 ## Current Position
 
-- **Phase:** 8 - Silent Failures Fix
-- **Plan:** 1 of 1 complete
-- **Status:** Complete
+- **Phase:** 9 - Voice Foundation
+- **Plan:** 1 of 2 complete
+- **Status:** In Progress
 
 ## Performance Metrics
 
@@ -40,7 +40,7 @@ See: .planning/PROJECT.md
 |--------|-------|
 | Phases completed | 9 |
 | Requirements delivered | 24/29 |
-| Plans executed | 15 |
+| Plans executed | 16 |
 
 ## Accumulated Context
 
@@ -85,12 +85,16 @@ See: .planning/PROJECT.md
 - Main process logging: Unconditional console.warn with [ClaudeState] prefix
 - Renderer logging: Debug-gated console.warn/error with [Renderer] prefix
 - IPC timeout: 30 seconds for systeminformation proxy
+- Porcupine Node SDK: Use @picovoice/porcupine-node (not web version) for main process
+- Voice in main process: CPU-intensive work offloaded from renderer
+- dotenv for API keys: Load PICOVOICE_ACCESS_KEY and OPENAI_API_KEY from .env file
+- Wake word sensitivity: 0.5 (balanced false positive/negative rate)
 
 ### Technical Notes
 - Node 16.x required (Electron 12 ABI compatibility)
 - openai@4.10.0 pinned (last Node 16 compatible version)
 - chokidar@3.5.3 for file watching (Windows race condition handling)
-- @picovoice/porcupine-web for wake word (WASM, not Node version)
+- @picovoice/porcupine-node@4.0.1 for wake word (Node SDK, not web version)
 - Platform detection: require('os').type() === 'Windows_NT'
 - Windows prompt patterns: /^PS ([A-Z]:\\[^>\r\n]*?)>\s*$/m (PowerShell), /^([A-Z]:\\[^>\r\n]*?)>\s*$/m (cmd)
 - Terminal names stored in: %APPDATA%/Son of Anton/terminalNames.json
@@ -255,11 +259,22 @@ See: .planning/PROJECT.md
 
 **Summary:** .planning/phases/08.1-silent-failures-fix/08.1-01-SUMMARY.md
 
+## Phase 9 Progress
+
+### Plan 01: Voice Infrastructure Setup
+**Completed:** 2026-01-22
+**Commits:**
+- `716f530` chore(09-01): install voice dependencies
+- `56cbe78` feat(09-01): create wake word detector and whisper client
+- `a9ddc24` feat(09-01): create voice IPC handlers
+
+**Summary:** .planning/phases/09-voice-foundation/09-01-SUMMARY.md
+
 ## Session Continuity
 
-**Last session:** 2026-01-21 - Completed Phase 8.1 (Silent Failures Fix)
-**Next action:** Continue with Phase 8 (Tools/MCP Display) or Phase 9 (Voice Foundation)
+**Last session:** 2026-01-22 - Completed 09-01 (Voice Infrastructure Setup)
+**Next action:** Continue with 09-02 (Boot Integration and Audio Capture)
 
 ---
 *State initialized: 2026-01-20*
-*Last updated: 2026-01-21*
+*Last updated: 2026-01-22*
