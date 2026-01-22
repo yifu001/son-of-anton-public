@@ -28,6 +28,7 @@
     "augmented-ui": "^1.1.2",
     "chokidar": "^3.5.3",
     "color": "3.2.1",
+    "dotenv": "^17.2.3",
     "geolite2-redist": "^2.0.4",
     "howler": "2.2.3",
     "maxmind": "4.3.2",
