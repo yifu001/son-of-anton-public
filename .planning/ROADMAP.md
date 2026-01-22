@@ -270,14 +270,16 @@ Plans:
 6. 60 second maximum recording duration, space key cancels immediately
 7. Audio sent to Whisper API and transcription returned successfully
 8. Transcription displayed directly in terminal input line
+9. Interim transcription shown in real-time via Web Speech API
 
 **Dependencies:** None (parallel track)
 
-**Plans:** 2 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Core voice infrastructure: Porcupine wake word, Whisper transcription, IPC, state machine
-- [ ] 09-02-PLAN.md — Voice UX polish: Yes sir response, waveform viz, toggle button, terminal input integration
+- [ ] 09-01-PLAN.md — Voice infrastructure: Porcupine SDK, Whisper client, IPC handlers
+- [ ] 09-02-PLAN.md — Voice integration: boot setup, AudioCapture, VoiceController state machine
+- [ ] 09-03-PLAN.md — Voice UX polish: Yes sir response, waveform viz, toggle button, Web Speech API interim transcription
 
 **Status:** Planned
 
