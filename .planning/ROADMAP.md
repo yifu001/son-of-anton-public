@@ -254,7 +254,7 @@ Plans:
 
 ## Phase 9: Voice Foundation
 
-**Goal:** Wake word detection and speech-to-text pipeline operational.
+**Goal:** Wake word detection and speech-to-text pipeline operational with polished UX.
 
 **Requirements:**
 - VOICE-01: Wake word "Son of Anton" triggers listening mode
@@ -264,12 +264,22 @@ Plans:
 **Success Criteria:**
 1. App requests and obtains microphone permission on first launch
 2. "Son of Anton" wake phrase detected with <500ms latency
-3. Audio chime plays immediately upon wake word detection
-4. Listening indicator visible in UI during capture
-5. Audio sent to Whisper API and transcription returned successfully
-6. Transcription displayed in UI (not yet sent to terminal)
+3. "Yes sir" voice response plays upon wake word detection
+4. Voice toggle button on right side enables/disables voice listening
+5. Waveform visualization at bottom of active terminal during recording
+6. 60 second maximum recording duration, space key cancels immediately
+7. Audio sent to Whisper API and transcription returned successfully
+8. Transcription displayed directly in terminal input line
 
 **Dependencies:** None (parallel track)
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 09-01-PLAN.md — Core voice infrastructure: Porcupine wake word, Whisper transcription, IPC, state machine
+- [ ] 09-02-PLAN.md — Voice UX polish: Yes sir response, waveform viz, toggle button, terminal input integration
+
+**Status:** Planned
 
 ---
 
@@ -290,22 +300,29 @@ Plans:
 
 **Dependencies:** Phase 2 (active terminal identification), Phase 9 (voice pipeline)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 10-01-PLAN.md — Integrate voice transcription with active terminal, confirmation UI, and settings
+
+**Status:** Pending
+
 ---
 
 ## Progress
 
 | Phase | Name | Status | Requirements |
 |-------|------|--------|--------------|
-| 1 | Bug Fixes | ✓ Complete | 3 |
-| 2 | Terminal Management | ✓ Complete | 3 |
-| 3 | UI Layout Restructure | ✓ Complete | 2 |
-| 4 | Claude Code State Infrastructure | ✓ Complete | 1 |
-| 5 | Context Tracking Display | ✓ Complete | 3 |
-| 5.1 | Quick Fixes & Branding | ✓ Complete | 2 |
-| 6 | Agent Visibility | ✓ Complete | 4 |
-| 7 | Todo Display | ✓ Complete | 3 |
-| 8 | Silent Failures Fix | ✓ Complete | 3 |
-| 9 | Voice Foundation | Pending | 3 |
+| 1 | Bug Fixes | Complete | 3 |
+| 2 | Terminal Management | Complete | 3 |
+| 3 | UI Layout Restructure | Complete | 2 |
+| 4 | Claude Code State Infrastructure | Complete | 1 |
+| 5 | Context Tracking Display | Complete | 3 |
+| 5.1 | Quick Fixes & Branding | Complete | 2 |
+| 6 | Agent Visibility | Complete | 4 |
+| 7 | Todo Display | Complete | 3 |
+| 8 | Silent Failures Fix | Complete | 3 |
+| 9 | Voice Foundation | Planned | 3 |
 | 10 | Voice Integration | Pending | 2 |
 
 **Total:** 29 requirements across 11 phases
